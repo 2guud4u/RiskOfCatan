@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { socket } from './socket';
+import { socket } from './socket/socket';
 import { ConnectionState } from './components/ConnectionState';
 import { ConnectionManager } from './components/ConnectionManager';
 import { Events } from "./components/Events";
 import { MyForm } from './components/MyForm';
+import StartMenu from './views/StartMenu';
 
 export default function App() {
   const [isConnected, setIsConnected] = useState(socket.connected);
@@ -42,6 +43,7 @@ export default function App() {
       <Events events={ fooEvents } />
       <ConnectionManager />
       <MyForm />
+      <StartMenu />
     </div>
   );
 }

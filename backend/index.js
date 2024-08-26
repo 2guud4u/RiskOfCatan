@@ -29,10 +29,10 @@ io.on('connection', (socket) => {
         console.log('message: ' + msg);
       });
     // Handle joining a room
-  socket.on('joinRoom', (room) => {
-    socket.join(room);
-    console.log(`User ${socket.id} joined room ${room}`);
-    socket.to(room).emit('message', `User ${socket.id} has joined the room`);
+  socket.on('joinRoom', (payload) => {
+    socket.join(payload.room);
+    console.log(`User ${socket.id} name ${payload.name} joined room ${payload.room}`);
+    io.to(payload.room).emit('joinedRoom', {room: payload.room});
   });
 
   // Handle leaving a room
