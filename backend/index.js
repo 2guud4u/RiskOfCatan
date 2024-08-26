@@ -32,7 +32,7 @@ io.on('connection', (socket) => {
   socket.on('joinRoom', (payload) => {
     socket.join(payload.room);
     console.log(`User ${socket.id} name ${payload.name} joined room ${payload.room}`);
-    io.to(payload.room).emit('joinedRoom', {room: payload.room});
+    socket.emit('joinedRoom', {room: payload.room});
   });
 
   // Handle leaving a room
@@ -50,3 +50,8 @@ io.on('connection', (socket) => {
 server.listen(5000, () => {
   console.log('server running at http://localhost:5000');
 });
+
+// io.to('some room').emit('some event'); sends to all users in 'some room'
+
+// socket.emit('some event'); sends to the unique socket connected to the server
+// socket.to('some room').emit('some event'); sends to all users in 'some room' except the sender
