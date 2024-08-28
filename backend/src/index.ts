@@ -11,7 +11,9 @@ const io = new Server(server, {
 });
 
 setString("hello world");
-console.log(getString("string"));
+getString("string").then((res) => {
+  console.log(res);
+});
 io.on('connection', (socket) => {
   console.log('a user connected');
     socket.on('disconnect', () => {
