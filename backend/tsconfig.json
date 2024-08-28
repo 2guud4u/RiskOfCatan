@@ -10,6 +10,11 @@
     "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references
     "moduleResolution": "node",
   },
+  "tsc-alias": {
+    "resolveFullPaths": true,
+    "verbose": false
+  },
   "include": ["src/**/*"],                  // Include all TypeScript files in src folder
   "exclude": ["node_modules"]               // Exclude node_modules directory
 }
+
