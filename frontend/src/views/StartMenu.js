@@ -11,7 +11,7 @@ export default function StartMenu() {
 
     React.useEffect(() => {
         function onJoinedRoom(payload){
-            console.log("recieved", payload);
+            
             
             navigate(`/play/${payload.room}`);
         }

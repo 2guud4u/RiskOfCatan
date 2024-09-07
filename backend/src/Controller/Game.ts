@@ -1,21 +1,13 @@
-import Game from "../models/game";
-import { Player } from "../types/player";
-import { createPlayer } from "../Services/Player";
 
+import { createPlayer } from "../Services/Player";
+import GameService from "../Services/Game";
 
 export async function addPlayer(gameId: string, name: string, color: string) {
 
-    let game = await getGame(gameId);
+    let game = await GameService.getGame(gameId);
     let player = createPlayer(name, color);
     game.players.push(player);
-    await game.save();
+    await GameService.updateGame(gameId, game);
     return game;
 }
 
-export async function getGame(gameId: string) {
-    const game = await Game.findOne({ id: gameId });
-    if (!game) {
-        throw new Error("Game not found");
-    }
-    return game;
-}

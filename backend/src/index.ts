@@ -3,6 +3,10 @@ import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { setString, getString } from './redis';
 import { getHexagonCoords,createCoordsMap } from './Services/Game';
+import { addPlayer } from './Controller/Game';
+import connectDB from './config/db';
+
+import SocketSetup from './Socket/index';
 const app = express();
 
 const server = createServer(app);
@@ -10,33 +14,37 @@ const io = new Server(server, {
   cors: { origin : 'http://localhost:3000',}
 });
 
+connectDB();
+SocketSetup(io);
 
-io.on('connection', (socket) => {
-  console.log('a user connected');
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-    });
-    socket.on('chat message', (msg) => {
-        console.log('message: ' + msg);
-      });
-    // Handle joining a room
-  socket.on('joinRoom', (payload) => {
-    socket.join(payload.room);
-    console.log(`User ${socket.id} name ${payload.name} joined room ${payload.room}`);
-    socket.emit('joinedRoom', {room: payload.room});
-  });
+// io.on('connection', (socket) => {
+//   console.log('a user connected');
+//     socket.on('disconnect', () => {
+//         console.log('user disconnected');
+//     });
+//     socket.on('chat message', (msg) => {
+//         console.log('message: ' + msg);
+//       });
+//     // Handle joining a room
+//   socket.on('joinRoom', (payload) => {
+//     socket.join(payload.room);
+//     console.log(`User ${socket.id} name ${payload.name} joined room ${payload.room}`);
+//     socket.emit('joinedRoom', {room: payload.room});
+//     addPlayer(payload.room, payload.name, "red");
+    
+//   });
 
-  // Handle leaving a room
-  socket.on('leaveRoom', (room) => {
-    socket.leave(room);
-    console.log(`User ${socket.id} left room ${room}`);
-    socket.to(room).emit('message', `User ${socket.id} has left the room`);
-  });
-  socket.on('sendMessage', (room, message) => {
-    console.log(`User ${socket.id} sent message to room ${room}: ${message}`);
-    io.to(room).emit('message', message);
-  });
-});
+//   // Handle leaving a room
+//   socket.on('leaveRoom', (room) => {
+//     socket.leave(room);
+//     console.log(`User ${socket.id} left room ${room}`);
+//     socket.to(room).emit('message', `User ${socket.id} has left the room`);
+//   });
+//   socket.on('sendMessage', (room, message) => {
+//     console.log(`User ${socket.id} sent message to room ${room}: ${message}`);
+//     io.to(room).emit('message', message);
+//   });
+// });
 
 
 server.listen(5000, () => {
