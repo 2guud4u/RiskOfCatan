@@ -6,6 +6,7 @@ export default function GameRoom() {
     <div className="GameRoom">
       <h1>Game Room</h1>
       <div>{gameId}</div>
+      <div>PlayerList</div>
     </div>
   );
 }
