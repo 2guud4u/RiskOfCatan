@@ -6,7 +6,8 @@ export default (io: Server) => {
     io.on('connection', (socket) => {
         
         socket.on('joinRoom', (payload) => {
-            socket.join(payload.room);
+            socket.join(payload.roomId);
+            console.log("joined room")
 
         });
 
