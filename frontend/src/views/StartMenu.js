@@ -1,25 +1,17 @@
 import React from 'react';
 import { MyForm } from '../components/MyForm';
-import {joinRoom, ListenForEvent} from '../socket/events';
+import { joinRoom, ListenForEvent} from '../socket/events';
 import { socket } from '../socket/socket';
 import { useNavigate } from 'react-router-dom';
 
 export default function StartMenu() {
-    const [name, setName] = React.useState('');
+    
   
     const navigate = useNavigate();
 
-    React.useEffect(() => {
-        function onJoinedRoom(payload){
-            
-            
-            navigate(`/play/${payload.room}`);
-        }
-        socket.on("joinedRoom", onJoinedRoom);
-        return () => {
-          socket.off("joinedRoom", onJoinedRoom);
-        };
-      }, []);
+    const navigateToGameRoom = (roomId) => {
+        navigate(`/play/${roomId}`);
+    }
 
     return (
         
@@ -30,16 +22,11 @@ export default function StartMenu() {
         Join a room:
         </div>
         <MyForm submitAction={(room)=>{
-            if(name){
-                
-                joinRoom(room, name)
-            }
+           navigateToGameRoom(room);
         }
             } />
-        <div>
-        name:
-        </div>
-        <MyForm submitAction={setName} />
+       
+        
         </div>
     );
 }
