@@ -11,6 +11,7 @@ export default function GameRoom() {
   const [name, setName] = React.useState('');
 
   const updatePlayerList = React.useCallback((payload) => {
+    console.log("updatePlayerList", payload);
     setPlayerList(payload.players);
   }
   , []);
@@ -21,12 +22,13 @@ export default function GameRoom() {
   }
   //on mount
   React.useEffect(() => {
-
-    socket.on("updatePlayerList", updatePlayerList);
     
+    socket.on("updatePlayerList", updatePlayerList);
+
     return () => {
       socket.off("updatePlayerList", updatePlayerList);
     };
+
   }, []);
 
   return (

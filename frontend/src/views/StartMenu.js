@@ -10,6 +10,7 @@ export default function StartMenu() {
     const navigate = useNavigate();
 
     const navigateToGameRoom = (roomId) => {
+        socket.emit('joinRoom', {roomId});
         navigate(`/play/${roomId}`);
     }
 

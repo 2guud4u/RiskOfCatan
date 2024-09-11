@@ -7,10 +7,7 @@ export default (io: Server) => {
         
         socket.on('joinRoom', (payload) => {
             socket.join(payload.room);
-        
 
-        
-        
         });
 
         socket.on('leaveRoom', (payload) => {
@@ -24,9 +21,12 @@ export default (io: Server) => {
         });
         
         socket.on("addPlayer", (payload) => {
+            
+            
             addPlayer(payload.room, payload.name, "red").then((res) => {
                 console.log(res, payload);
                 io.to(payload.room).emit('updatePlayerList', {players: res.players});
+                console.log(`User ${socket.id} joined room ${payload.room}`);
             });
             
         });
