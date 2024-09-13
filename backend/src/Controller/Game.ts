@@ -46,10 +46,11 @@ export async function generateBoardAndSave(gameId: string, radius: number): Prom
         
         // Create the board and token map
         const [coordsMap, tokenMap] = createCoordsMapAndTokenMap(radius);
+        console.log(tokenMap);
         game.board = coordsMap;
         game.tokenMap = tokenMap;
         game.phase = "setup";
-        
+        console.log(game);
         // Update the game data
         const res = await GameService.updateGame(gameId, game);
         

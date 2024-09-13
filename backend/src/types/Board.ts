@@ -52,7 +52,7 @@ export interface Game {
     players: Player[];
     roads: Road[];
     turnIndex: number;
-    tokenMap: Map<number, string[]>;
+    tokenMap: Map<string, string[]>;
     phase: Phase;
     
 

@@ -34,10 +34,10 @@ function deserializeCoords(serialized: string): Coords {
     return { x, y, z };
   }
 
-export function createCoordsMapAndTokenMap(tileRadius: number): [Map<string, Tile | Intersection>, Map<number, string[]>] {
+export function createCoordsMapAndTokenMap(tileRadius: number): [Map<string, Tile | Intersection>, Map<string, string[]>] {
     let tokenList = shuffleArray(flattenAndFillObject(numTokens));
     let ResourceList = shuffleArray(flattenAndFillObject(resources));
-    let tokenMap = new Map<number, string[]>();
+    let tokenMap = new Map<string, string[]>();
     let CoordsMap = new Map<string, Tile | Intersection>();
     //create tiles according to tileRadius
     let coords = getHexagonCoords(tileRadius * 2 -1);
@@ -59,16 +59,17 @@ export function createCoordsMapAndTokenMap(tileRadius: number): [Map<string, Til
 
         }
         else{
-            let token = Number(tokenList.pop())
-            
-            CoordsMap.set(serializeCoords(tileCoords[i]), new TileImpl((resource !== undefined ? resource : "Desert"), token, false));
-            
-                if(tokenMap.get(token) !== undefined){
-                    tokenMap.get(token)?.push(serializeCoords(tileCoords[i]));
-                } else {
-                    tokenMap.set(Number(token), [serializeCoords(tileCoords[i])]);
+            let token = tokenList.pop()
+            if(token !== undefined){
+                CoordsMap.set(serializeCoords(tileCoords[i]), new TileImpl((resource !== undefined ? resource : "Desert"), Number(token), false));
+                
+                    if(tokenMap.get(token) !== undefined){
+                        tokenMap.get(token)?.push(serializeCoords(tileCoords[i]));
+                    } else {
+                        tokenMap.set(token, [serializeCoords(tileCoords[i])]);
 
-                }
+                    }
+            }
             
         }
             
