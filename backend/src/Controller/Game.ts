@@ -1,6 +1,7 @@
 
 import { createPlayer } from "../Services/Player";
 import GameService from "../Services/Game";
+import {createCoordsMapAndTokenMap} from "../Services/Game";
 
 export async function addPlayer(gameId: string, name: string, color: string) {
 
@@ -33,6 +34,16 @@ export async function getPlayers(gameId: string) {
 export async function startGame(gameId: string) {
     let game = await GameService.getGame(gameId);
     
+    await GameService.updateGame(gameId, game);
+    return game;
+}
+
+export async function generateBoard(gameId: string, radius: number) {
+    let game = await GameService.getGame(gameId);
+    const [coordsMap, tokenMap] = createCoordsMapAndTokenMap(radius);
+    game.board = coordsMap;
+    game.tokenMap = tokenMap;
+    game.phase = "setup";
     await GameService.updateGame(gameId, game);
     return game;
 }

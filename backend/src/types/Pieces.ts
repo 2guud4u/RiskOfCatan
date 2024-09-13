@@ -45,13 +45,9 @@ export class SoldierImpl implements Soldier {
         this.injured = injured;
     }
 }
-enum DevCardType {
-    Knight = "Knight",
-    VictoryPoint = "VictoryPoint",
-    RoadBuilding = "RoadBuilding",
-    YearOfPlenty = "YearOfPlenty",
-    Monopoly = "Monopoly",
-}
+
+
+type DevCardType = "Knight" | "VictoryPoint" | "RoadBuilding" | "YearOfPlenty" | "Monopoly";
 
 export interface DevCard {
     type: DevCardType;

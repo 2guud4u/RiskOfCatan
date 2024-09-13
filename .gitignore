@@ -131,5 +131,7 @@ dist
 
 # custom
 
-*/secrets
-*/dumb.resolvedBorder
+secrets
+dump.rdb
+.$Design_Doc.drawio.bkp
+resources

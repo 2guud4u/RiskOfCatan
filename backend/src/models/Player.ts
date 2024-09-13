@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
+import PlayerInt from "../types/player";
+import { devCardSchema } from "./DevCard";
 
-const playerSchema = new mongoose.Schema({
+
+export const playerSchema = new mongoose.Schema<PlayerInt>({
     name: {
         type: String,
         required: true
@@ -15,8 +18,7 @@ const playerSchema = new mongoose.Schema({
         required: true
     },
     devCards: {
-        type: [mongoose.Schema.Types.Mixed],
-        required: true
+        type: [devCardSchema],
     }
 });
 

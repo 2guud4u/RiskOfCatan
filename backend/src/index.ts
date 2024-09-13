@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 
-import { getHexagonCoords,createCoordsMap } from './Services/Game';
+import { getHexagonCoords, createCoordsMapAndTokenMap } from './Services/Game';
 import { addPlayer } from './Controller/Game';
 import connectDB from './config/db';
 

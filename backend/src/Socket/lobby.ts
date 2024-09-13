@@ -4,7 +4,6 @@ import { get } from 'node:http';
 
 export default (io: Server) => {
     io.on('connection', (socket) => {
-        
         socket.on('joinRoom', (payload) => {
             socket.join(payload.roomId);
             console.log("joined room")
@@ -22,8 +21,6 @@ export default (io: Server) => {
         });
         
         socket.on("addPlayer", (payload) => {
-            
-            
             addPlayer(payload.room, payload.name, "red").then((res) => {
                 console.log(res, payload);
                 io.to(payload.room).emit('updatePlayerList', {players: res.players});
@@ -32,10 +29,7 @@ export default (io: Server) => {
             
         });
         
-        socket.on('startGame', (payload) => {
-            console.log('Game started');
-            io.to(payload.room).emit('gameStarted');
-        });
+        
       
     });
   };

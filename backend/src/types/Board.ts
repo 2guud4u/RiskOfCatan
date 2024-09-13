@@ -1,14 +1,7 @@
 import { Road, Settlement, Soldier } from "./Pieces";
-import { Player } from "./player";
+import Player  from "./player";
 
-export enum Resource {
-    Brick= "Brick",
-    Wood= "Wood",
-    Wheat= "Wheat",
-    Sheep= "Sheep",
-    Ore= "Ore",
-    Desert= "Desert"
-  }
+export type Resource = "Wheat" | "Sheep" | "Ore" | "Desert" | "Brick" | "Wood";
 
 export interface Tile {
    Resource: Resource;
@@ -51,33 +44,43 @@ export interface Coords {
 }
 
 
+export type Phase = "setup" | "lobby" | "action" | "trade" | "build" | "diceRoll";
+
 export interface Game {
-    board: Map<Coords, Tile | Intersection>;
+    board: Map<string, Tile | Intersection>;
     players: Player[];
     roads: Road[];
     turnIndex: number;
+    tokenMap: Map<number, string[]>;
+    phase: Phase;
+    
 
 }
 
 export class GameImpl implements Game {
-    board: Map<Coords, Tile | Intersection>;
+    board: Map<string, Tile | Intersection>;
     players: Player[];
     roads: Road[];
     turnIndex: number;
+    phase: Phase;
+    tokenMap: Map<number, string[]>;
 
-    constructor(board: Map<Coords, Tile | Intersection>){
+    constructor(board: Map<string, Tile | Intersection>,tokenMap:  Map<number, string[]>, phase: Phase){
         this.board = board;
         this.players = [];
         this.roads = [];
         this.turnIndex = 0;
+        this.phase = phase;
+        this.tokenMap = tokenMap;
+
 
     }
 
-    lookupCoords(coords: Coords): Tile | Intersection | undefined {
+    lookupCoords(coords: string): Tile | Intersection | undefined {
         return this.board.get(coords);
     }
 
-    updateCoords(coords: Coords, value: Tile | Intersection): void {
+    updateCoords(coords: string, value: Tile | Intersection): void {
         this.board.set(coords, value);
     }
     addPlayer(player: Player): void {

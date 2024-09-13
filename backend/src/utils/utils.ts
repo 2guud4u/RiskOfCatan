@@ -1,5 +1,5 @@
 
-export function shuffleArray(array: any[]): any[] {
+export function shuffleArray<T>(array: T[]): T[] {
 
     for (let i = array.length - 1; i > 0; i--) {
       // Pick a random index from 0 to i
@@ -9,6 +9,11 @@ export function shuffleArray(array: any[]): any[] {
       [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
+}
+
+export function flattenAndFillObject<T extends string | number | symbol>(target:{ [key in T]: number }): T[] {
+
+  return Object.entries(target).flatMap(([key, count]) => Array(count).fill(key) as T[])
 }
 
 // export function cubicToCartesian(q: number,r: number): {x: number, y: number} {

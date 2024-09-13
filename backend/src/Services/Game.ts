@@ -1,10 +1,10 @@
 import {Coords, Tile, Intersection, TileImpl, Resource} from "../types/Board"
-import {shuffleArray} from "../utils/utils"
+import {shuffleArray, flattenAndFillObject} from "../utils/utils"
 import Game from "../models/Game";
 import { Player } from "../types/player";
 import { Document } from 'mongoose';
 
-let NumTokens = {
+let numTokens: { [key in string]: number } = {
     "2": 1,
     "3": 2,
     "4": 2,
@@ -16,16 +16,15 @@ let NumTokens = {
     "11": 2,
     "12": 1
 };
-let resources = {
+
+let resources: { [key in Resource]: number } = {
     "Wheat": 4,
     "Sheep": 4,
     "Ore": 3,
     "Desert": 1,
     "Brick": 3,
     "Wood": 4
-
-    
-}
+};
 
 function serializeCoords(coords: Coords) {
     return `${coords.x},${coords.y},${coords.z}`;
@@ -35,38 +34,47 @@ function deserializeCoords(serialized: string): Coords {
     return { x, y, z };
   }
 
-export function createCoordsMap(size: number){
-    let tokenList = shuffleArray(Object.entries(NumTokens).flatMap(([token, count]) => Array(count).fill(token)));
-    let ResourceList = shuffleArray(Object.entries(resources).flatMap(([resource, count]) => Array(count).fill(resource)));
-
-    let CoordsMap = new Map<String, Tile | Intersection>();
-    //create tiles according to size
-    let coords = getHexagonCoords(size * 2 -1);
+export function createCoordsMapAndTokenMap(tileRadius: number): [Map<string, Tile | Intersection>, Map<number, string[]>] {
+    let tokenList = shuffleArray(flattenAndFillObject(numTokens));
+    let ResourceList = shuffleArray(flattenAndFillObject(resources));
+    let tokenMap = new Map<number, string[]>();
+    let CoordsMap = new Map<string, Tile | Intersection>();
+    //create tiles according to tileRadius
+    let coords = getHexagonCoords(tileRadius * 2 -1);
 
     //fill in intersections
     for (let i = 0; i < coords.length; i++){
         CoordsMap.set(serializeCoords(coords[i]), {Settlement: null, Soldiers: [], Port: null});
     }
     //get tile coords
-    let tileCoordsSet = new Set(getTileCoords({x: 0, y: 0, z: 0}, size).map(coords => serializeCoords(coords)));
+    let tileCoordsSet = new Set(getTileCoords({x: 0, y: 0, z: 0}, tileRadius).map(coords => serializeCoords(coords)));
     let tileCoords = Array.from(tileCoordsSet).map(serialized => {
         return deserializeCoords(serialized);
       });
     //fill in tiles
     for(let i = 0; i < tileCoords.length; i++){
         let resource = ResourceList.pop();
-        if (resource === Resource.Desert){
+        if (resource === "Desert"){
             CoordsMap.set(serializeCoords(tileCoords[i]), new TileImpl(resource, -1, true));
+
         }
         else{
-            CoordsMap.set(serializeCoords(tileCoords[i]), new TileImpl(resource, tokenList.pop(), false));
+            let token = Number(tokenList.pop())
+            
+            CoordsMap.set(serializeCoords(tileCoords[i]), new TileImpl((resource !== undefined ? resource : "Desert"), token, false));
+            
+                if(tokenMap.get(token) !== undefined){
+                    tokenMap.get(token)?.push(serializeCoords(tileCoords[i]));
+                } else {
+                    tokenMap.set(Number(token), [serializeCoords(tileCoords[i])]);
+
+                }
+            
         }
-        
+            
     }
-    
 
-
-    return CoordsMap;
+    return [CoordsMap, tokenMap];
 }
 
 function getTileCoords(root: Coords, hexRadius: number): Coords[]{
