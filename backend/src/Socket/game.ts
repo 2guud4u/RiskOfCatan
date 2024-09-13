@@ -1,4 +1,5 @@
 import { Server } from 'socket.io';
+import {generateBoardAndSave} from '../Controller/Game';
 
 export default (io: Server) => {
     io.on('connection', (socket) => {
@@ -14,8 +15,16 @@ export default (io: Server) => {
         socket.on("generateBoard", (payload) => {
             const { radius, roomId } = payload;
             console.log("Generating board");
-            
-        }
+            generateBoardAndSave(roomId, radius).then((board) => {
+            if(board){
+                io.to(roomId).emit('generateBoardResult', board);
+
+            }
+            console.log(board);
+        });
+
+
+        });
     });
   };
 

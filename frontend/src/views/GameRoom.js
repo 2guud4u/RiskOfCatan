@@ -20,11 +20,19 @@ export default function GameRoom() {
     socket.emit("addPlayer", {name: name, room: roomId});
     setName(name);
   }
+
+  const generateNewBoard = React.useCallback(() => {
+    socket.emit("generateBoard", {roomId: roomId, radius: 3});
+  },[]);
+  
   //on mount
   React.useEffect(() => {
     
     socket.on("updatePlayerList", updatePlayerList);
-
+    socket.on("generateBoardResult", (payload) => {
+      console.log("generateBoardResult", payload);
+    });
+    
     return () => {
       socket.off("updatePlayerList", updatePlayerList);
     };
@@ -52,7 +60,7 @@ export default function GameRoom() {
         </>)
 }
       
-     
+     <button onClick={generateNewBoard}>Generate New Board</button>
     </div>
   );
 }

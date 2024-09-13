@@ -1,8 +1,8 @@
 import {Coords, Tile, Intersection, TileImpl, Resource} from "../types/Board"
 import {shuffleArray, flattenAndFillObject} from "../utils/utils"
 import Game from "../models/Game";
-import { Player } from "../types/player";
-import { Document } from 'mongoose';
+import Player from "../types/player";
+import { Document, UpdateWriteOpResult } from 'mongoose';
 
 let numTokens: { [key in string]: number } = {
     "2": 1,
@@ -155,22 +155,29 @@ export function rotate60degree(coord: Coords): Coords{
             id: id,
             board: new Map(),
             players: [],
-            roads: []
+            roads: [],
+            turnIndex: 0,
+            tokenMap: new Map(),
+            phase: "setup"
+
+
         });
         await game.save();
         return game;
     }
 
-    async updateGame(gameId: string, game: Document<any, any>)  {
-        let updatedGame = await Game.updateOne({ id: gameId }, game);
-        return updatedGame;
+    async updateGame(gameId: string, game: Document<any, any>): Promise<UpdateWriteOpResult>  {
+        let result = await Game.updateOne({ id: gameId }, game);
+        return result;
     }
 
     async getGame(gameId: string){
         try{
             let game = await Game.findOne({ id: gameId });
             if(!game){
+                console.log("creating game", gameId);
                 game = await this.createGame(gameId);
+
             }
             return game;
 

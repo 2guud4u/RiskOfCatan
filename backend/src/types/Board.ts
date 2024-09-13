@@ -47,6 +47,7 @@ export interface Coords {
 export type Phase = "setup" | "lobby" | "action" | "trade" | "build" | "diceRoll";
 
 export interface Game {
+    id: string;
     board: Map<string, Tile | Intersection>;
     players: Player[];
     roads: Road[];
@@ -57,37 +58,37 @@ export interface Game {
 
 }
 
-export class GameImpl implements Game {
-    board: Map<string, Tile | Intersection>;
-    players: Player[];
-    roads: Road[];
-    turnIndex: number;
-    phase: Phase;
-    tokenMap: Map<number, string[]>;
+// export class GameImpl implements Game {
+//     board: Map<string, Tile | Intersection>;
+//     players: Player[];
+//     roads: Road[];
+//     turnIndex: number;
+//     phase: Phase;
+//     tokenMap: Map<number, string[]>;
 
-    constructor(board: Map<string, Tile | Intersection>,tokenMap:  Map<number, string[]>, phase: Phase){
-        this.board = board;
-        this.players = [];
-        this.roads = [];
-        this.turnIndex = 0;
-        this.phase = phase;
-        this.tokenMap = tokenMap;
+//     constructor(,board: Map<string, Tile | Intersection>,tokenMap:  Map<number, string[]>, phase: Phase){
+//         this.board = board;
+//         this.players = [];
+//         this.roads = [];
+//         this.turnIndex = 0;
+//         this.phase = phase;
+//         this.tokenMap = tokenMap;
 
 
-    }
+//     }
 
-    lookupCoords(coords: string): Tile | Intersection | undefined {
-        return this.board.get(coords);
-    }
+//     lookupCoords(coords: string): Tile | Intersection | undefined {
+//         return this.board.get(coords);
+//     }
 
-    updateCoords(coords: string, value: Tile | Intersection): void {
-        this.board.set(coords, value);
-    }
-    addPlayer(player: Player): void {
-        this.players.push(player);
-    }
+//     updateCoords(coords: string, value: Tile | Intersection): void {
+//         this.board.set(coords, value);
+//     }
+//     addPlayer(player: Player): void {
+//         this.players.push(player);
+//     }
 
-}
+// }
 
 
 
