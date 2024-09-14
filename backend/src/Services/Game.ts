@@ -1,5 +1,5 @@
 import {Coords, Tile, Intersection, TileImpl, Resource} from "../types/Board"
-import {shuffleArray, flattenAndFillObject} from "../utils/utils"
+import {shuffleArray, flattenAndFillObject, rotate60degree, deserializeCoords, serializeCoords, getRotatedHexCoords} from "../utils/utils"
 import Game from "../models/Game";
 import Player from "../types/player";
 import { Document, UpdateWriteOpResult } from 'mongoose';
@@ -26,13 +26,7 @@ let resources: { [key in Resource]: number } = {
     "Wood": 4
 };
 
-function serializeCoords(coords: Coords) {
-    return `${coords.x},${coords.y},${coords.z}`;
-  }
-function deserializeCoords(serialized: string): Coords {
-    const [x, y, z] = serialized.split(',').map(Number);
-    return { x, y, z };
-  }
+
 
 export function createCoordsMapAndTokenMap(tileRadius: number): [Map<string, Tile | Intersection>, Map<string, string[]>] {
     let tokenList = shuffleArray(flattenAndFillObject(numTokens));
@@ -79,12 +73,8 @@ export function createCoordsMapAndTokenMap(tileRadius: number): [Map<string, Til
 }
 
 function getTileCoords(root: Coords, hexRadius: number): Coords[]{
-    let tileCoords = [];
-    for (let i = 0; i < 6; i++) {
-        let rotated = rotate60degree(root);
-        root = rotated;
-        tileCoords.push(rotated);
-    }
+    let tileCoords = getRotatedHexCoords(root);
+    
     if(hexRadius === 1){
         return tileCoords;
     }
@@ -93,15 +83,7 @@ function getTileCoords(root: Coords, hexRadius: number): Coords[]{
 }
 export function getHexagonCoords(radius: number): Coords[] {
     let coords = [];
-    radius = 5;
-    // for (let x = -radius; x <= radius; x++) {
-    //     for (let y = Math.max(-radius, -x - radius); y <= Math.min(radius, -x + radius); y++) {
-    //         let z = -x - y;
-    //         if (Math.abs(x) <= radius && Math.abs(y) <= radius && Math.abs(z) <= radius) {
-    //             coords.push({ x, y, z });
-    //         }
-    //     }
-    // }
+    
 
     for (let x = -radius; x <= radius; x++) {
         for (let y = -radius; y <= radius; y++) {
@@ -141,12 +123,7 @@ export function getCoordsForRemoval(root: Coords,radius: number) : Coords[]{
   
 }
 
-export function rotate60degree(coord: Coords): Coords{
-    let x = coord.x;
-    let y = coord.y;
-    let z = coord.z;
-    return {x: -y, y: -z, z: -x}
-}
+
 
 ////////////db interactions
 

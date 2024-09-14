@@ -4,6 +4,7 @@ import {generateBoardAndSave} from '../Controller/Game';
 export default (io: Server) => {
     io.on('connection', (socket) => {
         socket.on("rollDice", (payload) => {
+            const { roomId, diceRoll } = payload;
             console.log("Dice rolled");
         });
        
