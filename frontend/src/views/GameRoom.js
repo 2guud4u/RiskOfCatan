@@ -2,7 +2,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import React from 'react';
 import { socket } from '../socket/socket';
 import { MyForm } from '../components/MyForm';
-
+import { sendRollDice } from '../socket/actions';
 export default function GameRoom() {
   const { roomId } = useParams();
   const location = useLocation();
@@ -61,6 +61,7 @@ export default function GameRoom() {
 }
       
      <button onClick={generateNewBoard}>Generate New Board</button>
+     <button onClick={()=>sendRollDice(roomId)}>roll Dice</button>
     </div>
   );
 }

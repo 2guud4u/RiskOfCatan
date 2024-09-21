@@ -53,3 +53,5 @@ export interface DevCard {
     type: DevCardType;
     used: boolean;
 }
+
+export type buildType = "Settlement" | "Road" | "City" | "Soldier";

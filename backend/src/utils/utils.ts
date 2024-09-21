@@ -41,6 +41,9 @@ export function getRotatedHexCoords(rootCoords: {x: number, y: number, z: number
   return coords;
 }
 
+export function rollDice(): number {
+  return Math.floor(Math.random() * 6) + 1;
+}
 // export function cubicToCartesian(q: number,r: number): {x: number, y: number} {
 //   const x = HEX_SIZE * (q + 0.5 * r);
 //   const y = HEX_RADIUS * r;

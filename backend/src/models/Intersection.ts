@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
+import soldierSchema from "./Soldier";
+import settlementSchema from "./Settlement";
 
 const intersectionSchema = new mongoose.Schema({
     Settlement: {
-        type: mongoose.Schema.Types.Mixed
+        type: settlementSchema
     },
     Soldiers: {
-        type: [mongoose.Schema.Types.Mixed]
+        type: [soldierSchema]
     },
 });
 

@@ -1,10 +1,15 @@
 import { Server } from 'socket.io';
 import {generateBoardAndSave} from '../Controller/Game';
+import {rollDice} from '../utils/utils';
+import {handleDiceRollPhase} from '../Controller/Phases/DiceRoll';
 
 export default (io: Server) => {
     io.on('connection', (socket) => {
         socket.on("rollDice", (payload) => {
-            const { roomId, diceRoll } = payload;
+            const { roomId } = payload;
+            const roll1 = rollDice();
+            const roll2 = rollDice();
+            handleDiceRollPhase(roomId, (roll1 + roll2).toString());
             console.log("Dice rolled");
         });
        
