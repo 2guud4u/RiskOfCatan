@@ -47,7 +47,7 @@ export class SoldierImpl implements Soldier {
 }
 
 
-type DevCardType = "Knight" | "VictoryPoint" | "RoadBuilding" | "YearOfPlenty" | "Monopoly";
+export type DevCardType = "Knight" | "VictoryPoint" | "RoadBuilding" | "YearOfPlenty" | "Monopoly";
 
 export interface DevCard {
     type: DevCardType;
