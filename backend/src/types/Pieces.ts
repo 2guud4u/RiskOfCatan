@@ -54,4 +54,10 @@ export interface DevCard {
     used: boolean;
 }
 
-export type buildType = "Settlement" | "Road" | "City" | "Soldier";
+const buildTypes = ["Settlement", "Road", "City", "Soldier"] as const;
+
+export type buildType = typeof buildTypes[number];
+
+export const isBuildType = (arg: any): arg is buildType => {
+    return buildTypes.includes(arg);
+}

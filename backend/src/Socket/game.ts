@@ -2,6 +2,8 @@ import { Server } from 'socket.io';
 import {generateBoardAndSave} from '../Controller/Game';
 import {rollDice} from '../utils/utils';
 import {handleDiceRollPhase} from '../Controller/Phases/DiceRoll';
+import { isBuildType } from '../types/Pieces';
+import { handleBuild } from '../Controller/Phases/Build';
 
 export default (io: Server) => {
     io.on('connection', (socket) => {
@@ -28,7 +30,15 @@ export default (io: Server) => {
             }
             console.log(board);
         });
-
+        
+        socket.on("build", (payload) => {
+            const {roomId, player, location, type} = payload;
+            console.log("Building");
+            if(isBuildType(type)){
+                handleBuild(player, roomId, location, type);
+            }
+            
+        });
 
         });
     });

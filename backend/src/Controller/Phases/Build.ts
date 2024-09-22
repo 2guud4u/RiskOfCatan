@@ -1,5 +1,5 @@
 import { Coords, Intersection, Tile } from './../../types/Board';
-import { Settlement } from './../../types/Pieces';
+import { Settlement, isBuildType } from './../../types/Pieces';
 
 import { buildType } from '../../types/Pieces';
 import GameService from "../../Services/Game";
@@ -8,6 +8,7 @@ import Soldier from '../../models/Soldier';
 import { Resource } from '../../types/Board';
 import Player from '../../types/player';
 import { DevCardType } from '../../types/Pieces';
+import { deserializeCoords, serializeCoords } from '../../utils/utils';
 const costs = {
     "Settlement": new Map<Resource, number>([
         ["Brick", 1],
@@ -40,8 +41,55 @@ export const handleBuildPhase = () => {
 
 };
 
-const handleBuild = (player: string, gameId: string, location: Coords[], building: buildType) => {
+export const handleBuild = async (player: string, gameId: string, location: Coords[], type: buildType | "DevCard") : Promise<Boolean> => {
+    let game = await GameService.getGame(gameId);
+    let gameMap = game.board;
+    let players = game.players;
+    try{
+        if(gameMap === undefined){
+            throw new Error("No game map");
+        }
+        if(players === undefined){
+            throw new Error("No players in game");
+        }
+        //get intersections
+        
+        let intersections = location.map((coord) => {return gameMap.get(serializeCoords(coord)) as Intersection});
+        //check if intersection is valid
+        if(intersections.some((intersection) => intersection === undefined)){
+            
+            throw new Error("Invalid intersections:" + intersections);
+        }
+
+      
+        
+
+        
+        switch(type){
+            case "Settlement":
+                buildSettlement(player, intersections[0]);
+                break;
+            case "Road":
+                buildRoad(player, intersections);
+                break;
+            case "City":
+                upgradeCity(intersections[0]);
+                break;
+            case "DevCard":
+                buildDevCard(player, players);
+                break;
+            case "Soldier":
+                buildSoldier(player, intersections[0]);
+                break;
+    }} catch(e){
+        console.log(e);
+        return false;
+    }
+
+    console.log("updated map",gameMap);
+    await GameService.updateGame(gameId, game);
     
+    return true;
 };
 
 const handleBuy = async (playerName: string, gameId: string, buyType: buildType | "DevCard"): Promise<Boolean> => {
@@ -68,27 +116,26 @@ const handleBuy = async (playerName: string, gameId: string, buyType: buildType 
     return false;
 };
 
-const buildSettlement = (coordinate: string, playerName: string, map: Map<string, Tile | Intersection>): Map<string, Tile | Intersection> => {
-    let Intersection = map.get(coordinate) as Intersection;
-    if(Intersection === undefined){
-        throw new Error("No intersection at coordinate");
-    }
-    if(Intersection.Settlement !== null){
+const buildSettlement = ( playerName: string, intersection: Intersection): Intersection => {
+
+    if(intersection.Settlement !== null){
         throw new Error("Intersection already occupied");
     }
-    Intersection.Settlement = {owner: playerName, upgraded: false};
-    map.set(coordinate, Intersection);
-
-    return map;
+    intersection.Settlement = {owner: playerName, upgraded: false};
+    return intersection;
     
 }
 
-const buildRoad = () => {
+const buildRoad = (player: string, intersections: Intersection[]) => {
     
 }
 
-const upgradeCity = () => {
-        
+const upgradeCity = (intersection: Intersection): Intersection => {
+    if(intersection.Settlement === null){
+        throw new Error("No settlement at intersection");
+    }
+    intersection.Settlement.upgraded = true;
+    return intersection;
 }
 
 const buildDevCard = (playerName: string, players: Player[]): Player[] => {
@@ -106,14 +153,9 @@ const buildDevCard = (playerName: string, players: Player[]): Player[] => {
     return players;
 }
 
-const buildSoldier = (coordinate: string, playerName: string, map: Map<string, Tile | Intersection>): Map<string, Tile | Intersection> => {
-    let Intersection = map.get(coordinate) as Intersection;
-    if(Intersection === undefined){
-        throw new Error("No intersection at coordinate");
-    }
-    let soldier = {owner: playerName, injured: false};
-    Intersection.Soldiers.push(soldier);
-    map.set(coordinate, Intersection);
+const buildSoldier = (playerName: string, intersection: Intersection): Intersection => {
 
-    return map;
+    let soldier = {owner: playerName, injured: false};
+    intersection.Soldiers.push(soldier);
+    return intersection;
 }
