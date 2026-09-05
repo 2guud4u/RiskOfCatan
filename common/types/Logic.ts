@@ -1,4 +1,5 @@
 import { SoldierObj } from './Pieces';
+import { Resource } from './Hex';
 
 /**
  * Turn / trade / battle state types. Types only — the price constants and
@@ -88,4 +89,22 @@ export type ResourceKey = keyof Price;
 export interface RollResult {
   die1: number | null;
   die2: number | null;
+}
+/** Result of a trade-eligibility check. */
+export interface TradeCheck {
+  allowed: boolean;
+  reason: string | null;
+}
+
+/** A single resource grant produced by a dice payout. */
+export interface Payout {
+  playerName: string;
+  resource: Exclude<Resource, 'Nothing'>;
+  amount: number;
+}
+
+/** Result of a build-eligibility check. */
+export interface BuildCheck {
+  allowed: boolean;
+  reason: string | null;
 }

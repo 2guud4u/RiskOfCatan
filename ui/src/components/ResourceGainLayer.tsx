@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useGameRoom } from '../contexts/GameContext';
-import { cubeToPixel, ResourceKey } from 'common';
+import { cubeToPixel, ResourceKey, RESOURCES } from 'common';
 import { RESOURCE_ICONS } from '../utils/resourceIcons';
-import { PROJ_SIZE } from '../constants';
+import { BOARD_CENTER, GAIN_DURATION, GAIN_STAGGER, PROJ_SIZE } from '../constants';
 
 /** A single resource icon flying from a source point to the resource panel. */
 interface FlyIcon {
@@ -14,11 +14,6 @@ interface FlyIcon {
   targetY: number;
   delay: number;
 }
-
-const DURATION = 5000; // ms per card flight
-const STAGGER = 110; // ms offset between successive cards
-const CENTER = { q: 0, r: 0, s: 0 }; // board center (the desert hex)
-const RESOURCE_KEYS: ResourceKey[] = ['Wood', 'Brick', 'Sheep', 'Wheat', 'Ore'];
 
 let nextId = 0;
 
@@ -72,7 +67,7 @@ const FlyIconView: React.FC<{
         },
       ],
       {
-        duration: DURATION,
+        duration: GAIN_DURATION,
         delay: icon.delay,
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         fill: 'forwards',
@@ -124,12 +119,12 @@ const ResourceGainLayer: React.FC = () => {
     // Gains = per-resource increases for the current player.
     const gains: Partial<Record<ResourceKey, number>> = {};
     if (prev) {
-      for (const k of RESOURCE_KEYS) {
+      for (const k of RESOURCES) {
         const d = (res[k] ?? 0) - (prev[k] ?? 0);
         if (d > 0) gains[k] = d;
       }
     }
-    const totalGained = RESOURCE_KEYS.reduce(
+    const totalGained = RESOURCES.reduce(
       (a, k) => a + (gains[k] ?? 0),
       0
     );
@@ -179,21 +174,21 @@ const ResourceGainLayer: React.FC = () => {
             );
             if (hasSettlement) return cubeToPixel(hex.coord, PROJ_SIZE);
           }
-          return cubeToPixel(CENTER, PROJ_SIZE);
+          return cubeToPixel(BOARD_CENTER, PROJ_SIZE);
         }
         if (sourceKind === 'steal') {
           const robberHex = Object.values(gameRoom.board!.hexes).find(
             (h) => h.robber
           );
           if (robberHex) return cubeToPixel(robberHex.coord, PROJ_SIZE);
-          return cubeToPixel(CENTER, PROJ_SIZE);
+          return cubeToPixel(BOARD_CENTER, PROJ_SIZE);
         }
-        return cubeToPixel(CENTER, PROJ_SIZE);
+        return cubeToPixel(BOARD_CENTER, PROJ_SIZE);
       };
 
       const newIcons: FlyIcon[] = [];
       let staggerIdx = 0;
-      for (const k of RESOURCE_KEYS) {
+      for (const k of RESOURCES) {
         const count = gains[k] ?? 0;
         if (count <= 0) continue;
 
@@ -210,7 +205,7 @@ const ResourceGainLayer: React.FC = () => {
             sourceY: sy,
             targetX: target.x,
             targetY: target.y,
-            delay: staggerIdx++ * STAGGER,
+            delay: staggerIdx++ * GAIN_STAGGER,
           });
         }
       }

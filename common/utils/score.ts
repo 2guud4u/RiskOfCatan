@@ -1,5 +1,6 @@
 import { Board } from '../types/Board';
 import { GameRoom } from '../types/Room';
+import { LONGEST_ROAD_MIN, LARGEST_ARMY_MIN, BONUS_VP } from '../Constant';
 
 /**
  * Room scoring bonuses: Longest Road and Largest Army (standard Catan rules).
@@ -11,13 +12,6 @@ import { GameRoom } from '../types/Room';
  * diffs the freshly computed state against `room.bonuses` and adjusts each
  * player's `victoryPoints` by the delta only.
  */
-
-/** Minimum road count for the Longest Road bonus. */
-export const LONGEST_ROAD_MIN = 5;
-/** Minimum soldier count for the Largest Army bonus. */
-export const LARGEST_ARMY_MIN = 3;
-/** Victory points awarded by each bonus. */
-export const BONUS_VP = 2;
 
 /** Total number of soldiers a player currently has on the board. */
 export function countSoldiers(board: Board, playerName: string): number {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGameRoom } from '../../contexts/GameContext';
-import DraggablePanel, { DefaultRect } from '../../components/DraggablePanel';
+import DraggablePanel from '../../components/DraggablePanel';
+import { DefaultRect } from '../../types';
 import Vertex from './Vertex';
 import Edge from './Edge';
 import TradeTab from './TradeTab';

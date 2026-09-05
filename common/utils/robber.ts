@@ -1,7 +1,7 @@
 import { Board, HexId } from '../types/Board';
 import { Player } from '../types/Player';
-import { ResourceKey } from '../types/Logic';
-import { BuildCheck } from './validation';
+import { ResourceKey, BuildCheck } from '../types/Logic';
+import { RESOURCES } from '../Constant';
 
 /**
  * Authoritative robber-placement checks, shared by the UI (highlighting) and
@@ -48,18 +48,12 @@ export function playersAdjacentToHex(board: Board, hexId: HexId, excludeName?: s
 }
 
 /**
- * Fixed resource order, shared by the backend (resolving a steal) and the UI
- * (rendering the face-down cards). The card at index `i` is the same in both.
- */
-export const RESOURCE_ORDER: ResourceKey[] = ['Wood', 'Brick', 'Sheep', 'Wheat', 'Ore'];
-
-/**
  * Expand a resource count into the individual cards it represents, in
- * `RESOURCE_ORDER` (e.g. { Wood: 2, Brick: 1 } -> [Wood, Wood, Brick]).
+ * `RESOURCES` (e.g. { Wood: 2, Brick: 1 } -> [Wood, Wood, Brick]).
  */
 export function expandCards(resources: Record<ResourceKey, number>): ResourceKey[] {
   const cards: ResourceKey[] = [];
-  for (const resource of RESOURCE_ORDER) {
+  for (const resource of RESOURCES) {
     const count = resources[resource] ?? 0;
     for (let i = 0; i < count; i++) cards.push(resource);
   }

@@ -1,4 +1,5 @@
 import { GameRoom, BattleState, SoldierBattleState, Board } from '../index';
+import { MAX_PER_ROUND } from '../Constant';
 
 /**
  * Combat resolution logic for soldier battles.
@@ -184,14 +185,6 @@ function sideOf(
 ): SoldierBattleState[] {
   return states[playerName]?.soldiers ?? [];
 }
-
-/**
- * Maximum soldiers that may fight on a side in a single round. Only the first
- * `MAX_PER_ROUND` committed troops (in commitment order) that are still
- * standing engage each round; the rest wait in reserve and step up as the
- * front line falls.
- */
-export const MAX_PER_ROUND = 3;
 
 /**
  * The troops that fight on a given side this round: the first

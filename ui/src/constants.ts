@@ -2,11 +2,11 @@
  * UI-only presentation constants (SVG layout sizes, spacings, thresholds).
  *
  * Domain values that must stay in sync with the backend (hex sizes, prices,
- * limits) live in `common/Constant.ts` and `common/utils/logic.ts` instead —
- * only pure rendering knobs belong here.
+ * limits) live in `common/Constant.ts` instead — only pure rendering knobs
+ * belong here.
  */
 
-import { GAME_HEX_SIZE } from 'common';
+import { GAME_HEX_SIZE, Price } from 'common';
 
 // ── BoardView ────────────────────────────────────────────────────────────────
 
@@ -35,3 +35,95 @@ export const RANK_SPACING = 13;
 
 /** Horizontal spacing between soldiers within a rank row. */
 export const SOLDIER_SPACING = 15;
+
+// ── BoardView (scale) ─────────────────────────────────────────────────────
+
+/** Minimum scale for responsive board sizing within its panel. */
+export const BOARD_MIN_SCALE = 0.5;
+/** Maximum scale for responsive board sizing within its panel. */
+export const BOARD_MAX_SCALE = 1.25;
+
+// ── GameLogic ──────────────────────────────────────────────────────────────
+
+/** How long (ms) a transient error toast stays visible before auto-dismissing. */
+export const TOAST_DURATION_MS = 4000;
+
+// ── BattleModal ────────────────────────────────────────────────────────────
+
+/** Distance of each side's formation from the vertex center (world units). */
+export const SIDE_OFFSET = 62;
+/** Rolled troops stop this far inside the center clash line. */
+export const CENTER_GAP = 15;
+/** Vertical spacing between troops in a line. */
+export const ROW_H = 34;
+/** Troop circle radius. */
+export const TROOP_R = 13;
+/** Small soldier dot radius — matches how garrisoned soldiers are drawn in MiniView. */
+export const SOLDIER_DOT_R = 6;
+/** Horizontal spacing between columns of the waiting line. */
+export const COL_W = 34;
+/** Maximum troops in a single column of the waiting line. */
+export const SIDE_COL_MAX = 6;
+
+// ── ResourceGainLayer ──────────────────────────────────────────────────────
+
+/** ms per card flight. */
+export const GAIN_DURATION = 5000;
+/** ms offset between successive cards. */
+export const GAIN_STAGGER = 110;
+/** Board center (the desert hex). */
+export const BOARD_CENTER = { q: 0, r: 0, s: 0 };
+
+// ── DraggablePanel ─────────────────────────────────────────────────────────
+
+/** Minimum pointer movement (px) before a press counts as a drag. */
+export const DRAG_THRESHOLD = 5;
+
+// ── BoardVertex (port) ─────────────────────────────────────────────────────
+
+/** Port (harbor) presentation — all sized relative to the vertex `size`. */
+/** How far past the vertex the badge sits (into the water). */
+export const PORT_OFFSET = 5;
+/** Badge radius. */
+export const PORT_RADIUS = 2.2;
+/** Inner "water" circle, as a fraction of the badge radius. */
+export const PORT_INNER = 0.72;
+/** Glyph font size. */
+export const PORT_TEXT = 1.7;
+/** Generic port fill. */
+export const PORT_GENERIC_FILL = '#7a4a1f';
+/** Special port fill. */
+export const PORT_SPECIAL_FILL = '#3f7fb5';
+/** Port stroke. */
+export const PORT_STROKE = '#1e2a38';
+/** Port water fill. */
+export const PORT_WATER = '#cfe8f7';
+
+// ── Game (layout) ──────────────────────────────────────────────────────────
+
+/** Gap between floating panels. */
+export const LAYOUT_GAP = 8;
+/** Width of the board rail. */
+export const RAIL_W = 280;
+/** Width of the sidebar. */
+export const SIDEBAR_W = 280;
+
+// ── useBoardViewport ───────────────────────────────────────────────────────
+
+/** Zoom limits relative to the board's natural (zoom-1) size. */
+export const MIN_ZOOM = 0.5;
+export const MAX_ZOOM = 3;
+/** Zoom step per wheel tick / button press. */
+export const ZOOM_STEP = 1.15;
+/** Minimum pointer movement (px) before a press counts as a pan. */
+export const PAN_THRESHOLD = 4;
+
+// ── useBuildRules ──────────────────────────────────────────────────────────
+
+/** "Afford any price" resource counts for free (Road Card) builds. */
+export const UNLIMITED_RESOURCES: Price = { Wood: 99, Brick: 99, Sheep: 99, Wheat: 99, Ore: 99 };
+
+// ── Trade / Dice ───────────────────────────────────────────────────────────
+
+/** Zeroed price, used as a starting accumulator for resource gains. */
+export const emptyPrice: Price = { Wood: 0, Brick: 0, Sheep: 0, Wheat: 0, Ore: 0 };

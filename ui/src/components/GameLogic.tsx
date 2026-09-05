@@ -6,6 +6,7 @@ import ConnectionBanner from './ConnectionBanner';
 import GamePage from '../pages/Game';
 import LobbyPage from '../pages/Lobby';
 import { clearSavedSession, readSavedSession } from '../utils/session';
+import { TOAST_DURATION_MS } from '../constants';
 
 /**
  * Sync the current player from a room update. Returns true if this socket is
@@ -99,7 +100,7 @@ const GameLogic: React.FC = () => {
   useEffect(() => {
     if (!toast) return;
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = window.setTimeout(() => setToast(null), 4000);
+    toastTimerRef.current = window.setTimeout(() => setToast(null), TOAST_DURATION_MS);
     return () => {
       if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     };

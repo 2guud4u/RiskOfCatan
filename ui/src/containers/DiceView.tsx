@@ -3,8 +3,7 @@ import { Board, Price, RollResult, computePayouts } from 'common';
 import { useGameRoom } from '../contexts/GameContext';
 import { useSocket } from '../contexts/SocketContext';
 import { priceLabel } from '../utils/price';
-
-const emptyPrice: Price = { Wood: 0, Brick: 0, Sheep: 0, Wheat: 0, Ore: 0 };
+import { emptyPrice } from '../constants';
 
 /** Total of the two dice, or null until both are rolled. */
 const rollTotal = (roll: RollResult): number | null =>

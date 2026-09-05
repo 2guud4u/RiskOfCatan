@@ -48,9 +48,6 @@ interface MiniViewProps {
   pixelSize?: number;
 }
 
-/** Board vertex/edge positions are pre-projected at GAME_HEX_SIZE. */
-const HEX_SIZE = GAME_HEX_SIZE;
-
 /**
  * Small SVG preview of the selected board object and its immediate
  * neighborhood: the adjacent hexes (terrain-colored, with tokens), the
@@ -284,7 +281,7 @@ const MiniView: React.FC<MiniViewProps> = ({
     });
   }
 
-  hexes.forEach((h) => points.push(cubeToPixel(h.coord, HEX_SIZE)));
+  hexes.forEach((h) => points.push(cubeToPixel(h.coord, GAME_HEX_SIZE)));
   if (points.length === 0) return null;
 
   // Center the view on the selected object (vertex position or edge midpoint).
@@ -326,15 +323,15 @@ const MiniView: React.FC<MiniViewProps> = ({
       {hexes.map((h) => (
         <g key={h.id}>
           <polygon
-            points={hexPointsAt(cubeToPixel(h.coord, HEX_SIZE).x, cubeToPixel(h.coord, HEX_SIZE).y, HEX_SIZE)}
+            points={hexPointsAt(cubeToPixel(h.coord, GAME_HEX_SIZE).x, cubeToPixel(h.coord, GAME_HEX_SIZE).y, GAME_HEX_SIZE)}
             fill={terrainColors[h.terrain] ?? '#DDD'}
             stroke="#000"
             strokeWidth={2}
           />
           {h.rollNumber !== null && (
             <text
-              x={cubeToPixel(h.coord, HEX_SIZE).x}
-              y={cubeToPixel(h.coord, HEX_SIZE).y}
+              x={cubeToPixel(h.coord, GAME_HEX_SIZE).x}
+              y={cubeToPixel(h.coord, GAME_HEX_SIZE).y}
               textAnchor="middle"
               dominantBaseline="middle"
               fill="#000"

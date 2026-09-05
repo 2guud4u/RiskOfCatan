@@ -8,6 +8,7 @@ import {
   canHealSoldierAt as checkHealSoldier,
 } from 'common';
 import { useGameRoom } from '../../contexts/GameContext';
+import { UNLIMITED_RESOURCES } from '../../constants';
 
 /**
  * Build eligibility rules for the sidebar panels. Delegates to the
@@ -32,7 +33,7 @@ export function useBuildRules(board: Board) {
           turn,
           name,
           edgeId,
-          hasFreeRoad ? { Wood: 99, Brick: 99, Sheep: 99, Wheat: 99, Ore: 99 } : resources
+          hasFreeRoad ? UNLIMITED_RESOURCES : resources
         )
       : { allowed: false, reason: 'No active turn' };
 

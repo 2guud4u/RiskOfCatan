@@ -4,8 +4,7 @@ import { useGameRoom } from '../../contexts/GameContext';
 import { useSocket } from '../../contexts/SocketContext';
 import { priceLabel } from '../../utils/price';
 import { RESOURCE_ICONS } from '../../utils/resourceIcons';
-
-const emptyPrice: Price = { Wood: 0, Brick: 0, Sheep: 0, Wheat: 0, Ore: 0 };
+import { emptyPrice } from '../../constants';
 
 /** Compact +/- stepper for a single resource amount. */
 const ResourceStepper: React.FC<{

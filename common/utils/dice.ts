@@ -1,18 +1,12 @@
 import { Board } from '../types/Board';
 import { Player } from '../types/Player';
 import { Resource, Terrain } from '../types/Hex';
-import { TerrainResourceMap } from './hex';
+import { TerrainResourceMap } from '../Constant';
+import { Payout } from '../types/Logic';
 
 /** Sum of the two dice (both must be rolled). */
 export function rollTotal(die1: number, die2: number): number {
   return die1 + die2;
-}
-
-/** A single resource grant produced by a dice payout. */
-export interface Payout {
-  playerName: string;
-  resource: Exclude<Resource, 'Nothing'>;
-  amount: number;
 }
 
 /**

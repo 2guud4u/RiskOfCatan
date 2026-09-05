@@ -11,13 +11,11 @@ import StealPrompt from './StealPrompt';
 import DevCardPrompt from './DevCardPrompt';
 import ResourceGainLayer from '../components/ResourceGainLayer';
 import BattleModal from './BattleModal';
-import DraggablePanel, { DefaultRect } from '../components/DraggablePanel';
+import DraggablePanel from '../components/DraggablePanel';
 import { resetAllPanels } from '../components/DraggablePanel';
 import { GAME_HEX_SIZE } from 'common';
-
-const GAP = 8;
-const RAIL_W = 280;
-const SIDEBAR_W = 280;
+import { DefaultRect } from '../types';
+import { LAYOUT_GAP, RAIL_W, SIDEBAR_W } from '../constants';
 
 /**
  * The game screen. Everything is floating: the board panel filling the
@@ -66,7 +64,7 @@ const Game: React.FC = () => {
       const h = measured[id]?.h;
       if (h == null) break;
       out[id] = { x: railX, y, w: RAIL_W, h };
-      y += h + GAP;
+      y += h + LAYOUT_GAP;
     }
     return out;
   }, [vp, measured, showDice]);

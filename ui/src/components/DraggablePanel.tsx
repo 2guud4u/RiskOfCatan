@@ -1,15 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { loadPanelLayout, savePanelLayout } from '../utils/panelLayout';
-
-/** A panel's home rect: origin + optional width/height (natural size when omitted). */
-export interface DefaultRect {
-  x: number;
-  y: number;
-  /** Omit to keep the panel's natural width. */
-  w?: number;
-  /** Omit to keep the panel's natural height. */
-  h?: number;
-}
+import { DefaultRect } from '../types';
+import { DRAG_THRESHOLD } from '../constants';
 
 interface DraggablePanelProps {
   children: React.ReactNode;
@@ -39,8 +31,6 @@ interface DraggablePanelProps {
    */
   followContent?: boolean;
 }
-
-const DRAG_THRESHOLD = 5;
 
 export const RESET_PANELS_EVENT = 'panel-layout:reset';
 export const resetAllPanels = (): void => {

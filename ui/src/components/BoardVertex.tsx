@@ -1,6 +1,16 @@
 import React from 'react';
 import { BoardVertex as BoardVertexType, PortType, PixelCoord } from 'common';
 import { RESOURCE_ICONS } from '../utils/resourceIcons';
+import {
+  PORT_GENERIC_FILL,
+  PORT_INNER,
+  PORT_OFFSET,
+  PORT_RADIUS,
+  PORT_SPECIAL_FILL,
+  PORT_STROKE,
+  PORT_TEXT,
+  PORT_WATER,
+} from '../constants';
 
 interface BoardVertexProps extends BoardVertexType {
   onClick: (vertexId: string) => void;
@@ -9,16 +19,6 @@ interface BoardVertexProps extends BoardVertexType {
   /** Owner's chosen color, used to tint the settlement. */
   ownerColor?: string;
 }
-
-// Port (harbor) presentation constants — all sized relative to the vertex `size`.
-const PORT_OFFSET = 5; // how far past the vertex the badge sits (into the water)
-const PORT_RADIUS = 2.2; // badge radius
-const PORT_INNER = 0.72; // inner "water" circle, as a fraction of the badge radius
-const PORT_TEXT = 1.7; // glyph font size
-const PORT_GENERIC_FILL = '#7a4a1f';
-const PORT_SPECIAL_FILL = '#3f7fb5';
-const PORT_STROKE = '#1e2a38';
-const PORT_WATER = '#cfe8f7';
 
 /**
  * A trade port (harbor) marker. Positioned radially outward from the board

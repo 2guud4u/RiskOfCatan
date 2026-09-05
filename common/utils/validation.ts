@@ -1,19 +1,8 @@
 import { Board, VertexId, EdgeId } from '../types/Board';
-import { TurnState, ResourceCount, Price } from '../types/Logic';
+import { TurnState, ResourceCount, Price, BuildCheck } from '../types/Logic';
 import { playerSettlementVertexIds, playerRoadEdgeIds } from './placement';
-import { SettlementPrice, RoadPrice, CityPrice, SoldierPrice, canAfford } from './logic';
-
-/**
- * Healing cost: twice the soldier creation cost (Rules.md line 27: "paying 2 of
- * each card used to create the soldier. No duplicates.").
- */
-export const HealSoldierPrice: Price = { Wood: 0, Brick: 0, Sheep: 2, Wheat: 2, Ore: 0 };
-
-/** Result of a build-eligibility check. */
-export interface BuildCheck {
-  allowed: boolean;
-  reason: string | null;
-}
+import { canAfford } from './logic';
+import { SettlementPrice, RoadPrice, CityPrice, SoldierPrice, HealSoldierPrice } from '../Constant';
 
 /**
  * Check if a vertex is adjacent to any of the player's roads.

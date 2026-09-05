@@ -8,6 +8,8 @@ import Hexagon from '../components/Hexagon';
 import { useBoardViewport } from '../hooks/useBoardViewport';
 import { ownerAngle } from '../utils/soldierPlacement';
 import {
+  BOARD_MAX_SCALE,
+  BOARD_MIN_SCALE,
   DROP_TARGET_RING_R,
   DROP_THRESHOLD_FRACTION,
   PROJ_SIZE,
@@ -19,10 +21,6 @@ interface BoardViewProps {
   /** On-screen render size (lobby preview vs. full game). */
   hexSize: number;
 }
-
-/** Scale limits for responsive board sizing within its panel. */
-const BOARD_MIN_SCALE = 0.5;
-const BOARD_MAX_SCALE = 1.25;
 
 /**
  * Renders the board as an SVG of hexes / edges / vertices.
@@ -266,6 +264,7 @@ const BoardView: React.FC<BoardViewProps> = ({ hexSize }) => {
     setMousePos(null);
   };
 
+  // 1.1 leaves margin past the hex ring so the coast trade ports are not clipped.
   const naturalSize = 1.1 * hexSize * boardSpan;
 
   // Size the board to fit its container, clamped so it never becomes too

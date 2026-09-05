@@ -4,7 +4,18 @@ import { useGameRoom } from '../contexts/GameContext';
 import { useSocket } from '../contexts/SocketContext';
 import MiniView from './SideBar/MiniView';
 import { playerColorMap } from '../utils/soldierPlacement';
-import { DROP_TARGET_RING_R, DROP_THRESHOLD_FRACTION, PROJ_SIZE } from '../constants';
+import {
+  COL_W,
+  CENTER_GAP,
+  DROP_TARGET_RING_R,
+  DROP_THRESHOLD_FRACTION,
+  PROJ_SIZE,
+  ROW_H,
+  SIDE_COL_MAX,
+  SIDE_OFFSET,
+  SOLDIER_DOT_R,
+  TROOP_R,
+} from '../constants';
 
 /**
  * The battle window: a separate full-screen view that opens for ALL players as
@@ -15,24 +26,11 @@ import { DROP_TARGET_RING_R, DROP_THRESHOLD_FRACTION, PROJ_SIZE } from '../const
  * round while the defender still has troops, or end it once they are wiped out.
  */
 
-// Arena geometry (world units, relative to the battle vertex center).
-const SIDE_OFFSET = 62; // distance of each side's formation from the vertex center
-const CENTER_GAP = 15; // rolled troops stop this far inside the center clash line
-const ROW_H = 34; // vertical spacing between troops in a line
-const TROOP_R = 13; // troop circle radius
-/** Small soldier dot radius — matches how garrisoned soldiers are drawn in MiniView. */
-const SOLDIER_DOT_R = 6;
-
 interface Slot {
   x: number;
   y: number;
   s: SoldierBattleState;
 }
-
-/** Horizontal spacing between columns of the waiting line. */
-const COL_W = 34;
-/** Maximum troops in a single column of the waiting line. */
-const SIDE_COL_MAX = 6;
 
 /**
  * Lay out one side's troops. Troops in the fight (rolled, not injured) line up

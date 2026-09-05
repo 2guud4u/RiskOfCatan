@@ -1,12 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-
-/** Zoom limits relative to the board's natural (zoom-1) size. */
-const MIN_ZOOM = 0.5;
-const MAX_ZOOM = 3;
-const ZOOM_STEP = 1.15;
-/** Minimum pointer movement (px) before a press counts as a pan, so plain
- *  clicks (selecting a vertex/edge) are not treated as a drag. */
-const PAN_THRESHOLD = 4;
+import { MAX_ZOOM, MIN_ZOOM, PAN_THRESHOLD, ZOOM_STEP } from '../constants';
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 

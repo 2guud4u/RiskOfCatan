@@ -23,3 +23,13 @@ export interface SavedPanelLayout {
   pos: { x: number; y: number } | null;
   size: { w: number; h: number } | null;
 }
+
+/** A panel's home rect: origin + optional width/height (natural size when omitted). */
+export interface DefaultRect {
+  x: number;
+  y: number;
+  /** Omit to keep the panel's natural width. */
+  w?: number;
+  /** Omit to keep the panel's natural height. */
+  h?: number;
+}

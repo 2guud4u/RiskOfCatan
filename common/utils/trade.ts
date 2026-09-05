@@ -1,15 +1,8 @@
 import { GameRoom } from '../types/Room';
-import { Price, ResourceCount, ResourceKey, TradeOffer } from '../types/Logic';
+import { Price, ResourceCount, ResourceKey, TradeCheck, TradeOffer } from '../types/Logic';
 import { Player } from '../types/Player';
 import { Board, VertexNode } from '../types/Board';
-
-/** Result of a trade-eligibility check. */
-export interface TradeCheck {
-  allowed: boolean;
-  reason: string | null;
-}
-
-const RESOURCES = ['Wood', 'Brick', 'Sheep', 'Wheat', 'Ore'] as const;
+import { RESOURCES } from '../Constant';
 
 /** Normalize an unknown input into a valid Price (clamped to >= 0). */
 export function normalizePrice(input: unknown): Price {
