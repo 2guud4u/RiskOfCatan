@@ -324,7 +324,7 @@ const DraggablePanel: React.FC<DraggablePanelProps> = ({
             </span>
           </div>
           <div className="flex-1 min-h-0 overflow-hidden">
-            <div ref={contentRef}>{children}</div>
+            <div ref={contentRef} className="h-full">{children}</div>
           </div>
         </div>
       )}

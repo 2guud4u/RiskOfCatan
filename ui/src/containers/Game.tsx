@@ -4,8 +4,6 @@ import BoardView from './BoardView';
 import Sidebar from './SideBar/Index';
 import EndTurnButton from './EndTurnButton';
 import DiceView from './DiceView';
-import ResourceCardsPanel from './ResourceCardsPanel';
-import PlayersList from './PlayersList';
 import RobberPrompt from './RobberPrompt';
 import StealPrompt from './StealPrompt';
 import DevCardPrompt from './DevCardPrompt';
@@ -19,12 +17,13 @@ import { LAYOUT_GAP, RAIL_W, SIDEBAR_W } from '../constants';
 
 /**
  * The game screen. Everything is floating: the board panel filling the
- * left area edge-to-edge, the sidebar in its own column, and a right
- * rail of panels (turn, players, dice, resources) stacked at cumulative
- * y-positions computed from their measured natural heights (default
- * height = natural content height, so nothing is ever clipped). The dice
- * card only appears while the current player needs to roll. Dragging a
- * panel moves only that panel — the others never reflow.
+ * left area edge-to-edge, the sidebar in its own column (with tabs for
+ * board, players, cards, trade, and battle), and a right rail of panels
+ * (turn, dice) stacked at cumulative y-positions computed from their
+ * measured natural heights (default height = natural content height, so
+ * nothing is ever clipped). The dice card only appears while the current
+ * player needs to roll. Dragging a panel moves only that panel — the
+ * others never reflow.
  */
 const Game: React.FC = () => {
   const { gameRoom, currentPlayer } = useGameRoom();
@@ -48,10 +47,10 @@ const Game: React.FC = () => {
     out.board = { x: 0, y: 0, w: Math.max(200, vw - SIDEBAR_W - RAIL_W), h: vh };
     // Sidebar: its own column, full height.
     out.sidebar = { x: vw - RAIL_W - SIDEBAR_W, y: 0, w: SIDEBAR_W, h: vh };
-    // Right rail: turn, players, dice (only while rolling), resources.
+    // Right rail: turn, dice (only while rolling).
     // Cumulative y from the measured natural heights; a panel is placed
     // once every panel above it has reported its height.
-    const railIds = ['turn', 'players', 'dice', 'resourceCards'];
+    const railIds = ['turn', 'dice'];
     const railX = vw - RAIL_W;
     let y = 0;
     for (const id of railIds) {
@@ -108,30 +107,7 @@ const Game: React.FC = () => {
       <DraggablePanel id="dice" className="bg-white rounded-lg shadow p-3 z-30" layout={layouts.dice} onMeasure={handleMeasure('dice')} followContent>
         <DiceView />
       </DraggablePanel>
-      <DraggablePanel
-        id="players"
-        className="bg-white rounded-lg shadow p-3 z-30"
-        layout={layouts.players}
-        onMeasure={handleMeasure('players')}
-        followContent
-      >
-        <PlayersList
-          players={gameRoom.players}
-          board={gameRoom.board}
-          bonuses={gameRoom.bonuses}
-          currentPlayerId={currentPlayer.id}
-        />
-      </DraggablePanel>
       <Sidebar layout={layouts.sidebar} onMeasure={handleMeasure('sidebar')} />
-      <DraggablePanel
-        id="resourceCards"
-        className="bg-white rounded-lg shadow p-3 z-30"
-        layout={layouts.resourceCards}
-        onMeasure={handleMeasure('resourceCards')}
-        followContent
-      >
-        <ResourceCardsPanel />
-      </DraggablePanel>
 
       {/* Steal prompt: the thief picks a face-down card from a victim. */}
       <StealPrompt />
