@@ -52,36 +52,20 @@ export function useBuildRules(board: Board) {
     turn ? checkHealSoldier(board, turn, name, soldierId, resources) : { allowed: false, reason: 'No active turn' };
 
   const canBuildSettlementAt = (vertexId: string): boolean => settlementCheck(vertexId).allowed;
-  const settlementReason = (vertexId: string): string =>
-    settlementCheck(vertexId).reason ?? 'Cannot build settlement here';
   const canBuildRoadOn = (edgeId: string): boolean => roadCheck(edgeId).allowed;
-  const roadReason = (edgeId: string): string => roadCheck(edgeId).reason ?? 'Cannot build road here';
   const canUpgradeToCityAt = (vertexId: string): boolean => cityCheck(vertexId).allowed;
-  const upgradeReason = (vertexId: string): string => cityCheck(vertexId).reason ?? 'Cannot upgrade to a city here';
   const canBuildSoldierAt = (vertexId: string): boolean => soldierCheck(vertexId).allowed;
-  const soldierReason = (vertexId: string): string =>
-    soldierCheck(vertexId).reason ?? 'Cannot build a soldier here';
   const canMoveSoldierTo = (soldierId: string, targetVertexId: string): boolean =>
     moveSoldierCheck(soldierId, targetVertexId).allowed;
-  const moveSoldierReason = (soldierId: string, targetVertexId: string): string =>
-    moveSoldierCheck(soldierId, targetVertexId).reason ?? 'Cannot move soldier there';
 
   const canHealSoldierAt = (soldierId: string): boolean => healSoldierCheck(soldierId).allowed;
-  const healSoldierReason = (soldierId: string): string =>
-    healSoldierCheck(soldierId).reason ?? 'Cannot heal this soldier';
 
   return {
     canBuildSettlementAt,
-    settlementReason,
     canBuildRoadOn,
-    roadReason,
     canUpgradeToCityAt,
-    upgradeReason,
     canBuildSoldierAt,
-    soldierReason,
     canMoveSoldierTo,
-    moveSoldierReason,
     canHealSoldierAt,
-    healSoldierReason,
   };
 }

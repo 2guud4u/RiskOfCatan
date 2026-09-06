@@ -108,19 +108,20 @@ const EndTurnButton: React.FC = () => {
     );
   }
 
-  const buttonClass = `w-full px-4 py-2 text-sm text-center rounded-md border border-gray-300 ${
-    isMyTurn ? 'bg-blue-600 text-white cursor-pointer' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-  }`;
-
-  const buttonLabel = isMyTurn
-    ? phaseText(gameRoom.turnState.phase)
-    : `Waiting on ${gameRoom.turnState.player}`;
+  const buttonClass =
+    'w-full px-4 py-2 text-sm text-center rounded-md border border-gray-300 bg-blue-600 text-white cursor-pointer';
 
   return (
     <div className="flex flex-col gap-1">
-      <button onClick={handleClick} disabled={!isMyTurn} className={buttonClass}>
-        {buttonLabel}
-      </button>
+      {isMyTurn ? (
+        <button onClick={handleClick} className={buttonClass}>
+          {phaseText(gameRoom.turnState.phase)}
+        </button>
+      ) : (
+        <div className="px-4 py-2 text-sm text-center rounded-md border border-gray-300 bg-gray-200 text-gray-500">
+          Waiting on {gameRoom.turnState.player}
+        </div>
+      )}
       {gameRoom.turnState.phase === 'Action' && isMyTurn && soldiersWithActionsLeft > 0 && (
         <div className="px-2 py-1 text-xs text-center rounded border border-amber-200 bg-amber-50 text-amber-800">
           ⚠ {soldiersWithActionsLeft} soldier{soldiersWithActionsLeft > 1 ? 's' : ''} still have action(s) left

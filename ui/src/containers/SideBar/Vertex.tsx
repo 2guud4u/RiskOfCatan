@@ -21,15 +21,10 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
   const { buildSettlement, upgradeSettlementToCity, buildSoldier, moveSoldier, healSoldier, startAttack } = useSocket();
   const {
     canBuildSettlementAt,
-    settlementReason,
     canUpgradeToCityAt,
-    upgradeReason,
     canBuildSoldierAt,
-    soldierReason,
     canMoveSoldierTo,
-    moveSoldierReason,
     canHealSoldierAt,
-    healSoldierReason,
   } = useBuildRules(board);
 
   // Group of soldier ids the player is assembling for a group action.
@@ -205,20 +200,16 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
           <div className="flex flex-col gap-1">
             {injured.map((s) => {
               const canHeal = groupActionsAllowed && canHealSoldierAt(s.id);
-              const reason = !groupActionsAllowed
-                ? 'Actions available on your Action phase'
-                : healSoldierReason(s.id);
-              return (
+              return canHeal ? (
                 <button
                   key={s.id}
                   onClick={() => handleHealSoldier(s.id)}
-                  disabled={!canHeal}
-                  className={buildButtonClass(canHeal)}
-                  title={canHeal ? `Heal ${s.owner} (2 Wheat, 2 Sheep)` : reason}
+                  className={buildButtonClass}
+                  title={`Heal ${s.owner} (2 Wheat, 2 Sheep)`}
                 >
                   ✚ Heal {s.owner}
                 </button>
-              );
+              ) : null;
             })}
           </div>
         )}
@@ -232,36 +223,27 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
               <div className="flex flex-col gap-1">
                 {roadAdjacentVertices.map((targetId) => {
                   const allCanMove = group.every((s) => canMoveSoldierTo(s.id, targetId));
-                  const reason = group
-                    .map((s) => (canMoveSoldierTo(s.id, targetId) ? null : moveSoldierReason(s.id, targetId)))
-                    .find((r) => r !== null);
-                  return (
+                  return allCanMove ? (
                     <button
                       key={targetId}
                       onClick={() => handleGroupMove(targetId)}
-                      disabled={!allCanMove}
-                      className={buildButtonClass(allCanMove)}
-                      title={allCanMove ? `Move the group to ${targetId}` : reason ?? 'Cannot move there'}
+                      className={buildButtonClass}
+                      title={`Move the group to ${targetId}`}
                     >
                       → Move to {targetId}
                     </button>
-                  );
+                  ) : null;
                 })}
               </div>
           </div>
         )}
 
         {/* Attack action — only when every group member is uninjured (Rule 28). */}
-        {canAttackGroup && (
+        {canAttackGroup && enemyTroopsHere.length > 0 && (
           <button
             onClick={handleConfirmAttack}
-            disabled={enemyTroopsHere.length === 0}
-            className={buildButtonClass(enemyTroopsHere.length > 0)}
-            title={
-              enemyTroopsHere.length > 0
-                ? `Attack the ${enemyTroopsHere.length} enemy troop(s) on this vertex`
-                : 'No enemy troops here to attack'
-            }
+            className={buildButtonClass}
+            title={`Attack the ${enemyTroopsHere.length} enemy troop(s) on this vertex`}
           >
             ⚔ Attack {enemyTroopsHere.length} enemy troop{enemyTroopsHere.length === 1 ? '' : 's'} here
           </button>
@@ -308,42 +290,31 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
         ))}
       </div>
 
-      <button
-        onClick={handleBuildSettlement}
-        disabled={!canBuildSettlement}
-        className={buildButtonClass(canBuildSettlement)}
-        title={
-          canBuildSettlement ? `Build settlement (${priceLabel(SettlementPrice)})` : settlementReason(vertex.id)
-        }
-      >
-        Build Settlement <span className="text-gray-500 text-xs">({priceLabel(SettlementPrice)})</span>
-      </button>
+      {canBuildSettlement && (
+        <button
+          onClick={handleBuildSettlement}
+          className={buildButtonClass}
+          title={`Build settlement (${priceLabel(SettlementPrice)})`}
+        >
+          Build Settlement <span className="text-gray-500 text-xs">({priceLabel(SettlementPrice)})</span>
+        </button>
+      )}
 
-      {settlement && settlement.level === 'settlement' && (
+      {settlement && settlement.level === 'settlement' && canUpgradeToCityAt(vertex.id) && (
         <button
           onClick={handleUpgradeToCity}
-          disabled={!canUpgradeToCityAt(vertex.id)}
-          className={buildButtonClass(canUpgradeToCityAt(vertex.id))}
-          title={
-            canUpgradeToCityAt(vertex.id)
-              ? `Upgrade to city (${priceLabel(CityPrice)})`
-              : upgradeReason(vertex.id)
-          }
+          className={buildButtonClass}
+          title={`Upgrade to city (${priceLabel(CityPrice)})`}
         >
           Upgrade to City <span className="text-gray-500 text-xs">({priceLabel(CityPrice)})</span>
         </button>
       )}
 
-      {settlement && settlement.ownerId === currentPlayer?.name && (
+      {settlement && settlement.ownerId === currentPlayer?.name && canBuildSoldierAt(vertex.id) && (
         <button
           onClick={handleBuildSoldier}
-          disabled={!canBuildSoldierAt(vertex.id)}
-          className={buildButtonClass(canBuildSoldierAt(vertex.id))}
-          title={
-            canBuildSoldierAt(vertex.id)
-              ? `Build a soldier here (${priceLabel(SoldierPrice)})`
-              : soldierReason(vertex.id)
-          }
+          className={buildButtonClass}
+          title={`Build a soldier here (${priceLabel(SoldierPrice)})`}
         >
           ⚔ Build Soldier <span className="text-gray-500 text-xs">({priceLabel(SoldierPrice)})</span>
         </button>

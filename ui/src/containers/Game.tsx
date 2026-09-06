@@ -40,12 +40,6 @@ const Game: React.FC = () => {
   const handleMeasure = (id: string) => (s: { w: number; h: number }) => {
     setMeasured((m) => (m[id] && m[id].w === s.w && m[id].h === s.h ? m : { ...m, [id]: s }));
   };
-  // The dice card only appears while the current player needs to roll.
-  const showDice =
-    !!gameRoom &&
-    gameRoom.turnState.phase === 'Dice' &&
-    gameRoom.turnState.player === currentPlayer?.name &&
-    (gameRoom.roll.die1 === null || gameRoom.roll.die2 === null);
 
   const layouts = useMemo(() => {
     const { vw, vh } = vp;
@@ -57,7 +51,7 @@ const Game: React.FC = () => {
     // Right rail: turn, players, dice (only while rolling), resources.
     // Cumulative y from the measured natural heights; a panel is placed
     // once every panel above it has reported its height.
-    const railIds = ['turn', 'players', ...(showDice ? ['dice'] : []), 'resourceCards'];
+    const railIds = ['turn', 'players', 'dice', 'resourceCards'];
     const railX = vw - RAIL_W;
     let y = 0;
     for (const id of railIds) {
@@ -67,7 +61,7 @@ const Game: React.FC = () => {
       y += h + LAYOUT_GAP;
     }
     return out;
-  }, [vp, measured, showDice]);
+  }, [vp, measured]);
   if (!gameRoom || !currentPlayer) {
     return <p className="text-center text-gray-500">Loading game...</p>;
   }
@@ -111,11 +105,9 @@ const Game: React.FC = () => {
         </div>
         <EndTurnButton />
       </DraggablePanel>
-      {showDice && (
-        <DraggablePanel id="dice" className="bg-white rounded-lg shadow p-3 z-30" layout={layouts.dice} onMeasure={handleMeasure('dice')} followContent>
-          <DiceView />
-        </DraggablePanel>
-      )}
+      <DraggablePanel id="dice" className="bg-white rounded-lg shadow p-3 z-30" layout={layouts.dice} onMeasure={handleMeasure('dice')} followContent>
+        <DiceView />
+      </DraggablePanel>
       <DraggablePanel
         id="players"
         className="bg-white rounded-lg shadow p-3 z-30"

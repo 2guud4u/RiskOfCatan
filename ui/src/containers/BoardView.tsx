@@ -305,7 +305,6 @@ const BoardView: React.FC<BoardViewProps> = ({ hexSize }) => {
             setMousePos(null);
           }}
           onMouseDown={viewport.onMouseDown}
-          onWheel={viewport.onWheel}
           onDoubleClick={viewport.onDoubleClick}
         >
           {/* Hex tiles layer (clickable while a robber move is pending) */}

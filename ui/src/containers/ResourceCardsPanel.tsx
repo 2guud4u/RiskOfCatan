@@ -128,27 +128,18 @@ const ResourceCardsPanel: React.FC = () => {
       </div>
 
       {/* Buy a development card. */}
-      <button
-        type="button"
-        onClick={handleDrawDevCard}
-        disabled={!canBuyDevCard}
-        className={`w-full px-3 py-2 text-sm text-center rounded-md border ${
-          canBuyDevCard
-            ? 'bg-purple-600 text-white cursor-pointer hover:bg-purple-700'
-            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-        }`}
-        title={`Cost: 1 wheat, 1 brick, 1 ore. ${gameRoom.devCardDeck.length} cards left in deck.`}
-      >
-        Buy Development Card (🌾1 🧱1 ⛏️1)
-        <span className="block text-[10px] opacity-75">
-          {gameRoom.devCardDeck.length} cards left in deck
-        </span>
-      </button>
-
-      {!isMyTurn && (
-        <div className="text-[11px] text-gray-400">
-          You can buy and play development cards on your turn.
-        </div>
+      {canBuyDevCard && (
+        <button
+          type="button"
+          onClick={handleDrawDevCard}
+          className="w-full px-3 py-2 text-sm text-center rounded-md border bg-purple-600 text-white cursor-pointer hover:bg-purple-700"
+          title={`Cost: 1 wheat, 1 brick, 1 ore. ${gameRoom.devCardDeck.length} cards left in deck.`}
+        >
+          Buy Development Card (🌾1 🧱1 ⛏️1)
+          <span className="block text-[10px] opacity-75">
+            {gameRoom.devCardDeck.length} cards left in deck
+          </span>
+        </button>
       )}
     </div>
   );

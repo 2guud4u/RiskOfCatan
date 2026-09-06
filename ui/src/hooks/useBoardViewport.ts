@@ -40,14 +40,6 @@ export function useBoardViewport(svgRef: React.RefObject<SVGSVGElement>, baseSiz
     setCenter({ x: 0, y: 0 });
   }, []);
 
-  const onWheel = useCallback(
-    (e: React.WheelEvent) => {
-      e.preventDefault();
-      zoomBy(e.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP);
-    },
-    [zoomBy]
-  );
-
   const onDoubleClick = useCallback(
     (e: React.MouseEvent) => {
       if (e.shiftKey) reset();
@@ -81,23 +73,33 @@ export function useBoardViewport(svgRef: React.RefObject<SVGSVGElement>, baseSiz
     const onUp = () => {
       panRef.current = null;
     };
+    // Native non-passive wheel listener: React attaches `wheel` passively at the
+    // root, so a synthetic handler's preventDefault() is ignored and the browser
+    // also zooms/scrolls the page (the "double zoom"). A non-passive listener
+    // can preventDefault(), so wheeling over the board zooms only the board.
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      zoomBy(e.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP);
+    };
+    const svg = svgRef.current;
+    if (svg) svg.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
     return () => {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
+      if (svg) svg.removeEventListener('wheel', onWheel);
     };
-    // pxPerBoard reads zoomRef (always current), so this only needs to re-run
-    // if the svg element or base size changes.
+    // pxPerBoard reads zoomRef (always current); zoomBy is a stable callback.
+    // Re-runs only if the svg element or base size changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [svgRef, half]);
+  }, [svgRef, half, zoomBy]);
 
   return {
     zoom,
     reset,
     isDirty: zoom !== 1 || center.x !== 0 || center.y !== 0,
     viewBox: `${center.x - half / zoom} ${center.y - half / zoom} ${(2 * half) / zoom} ${(2 * half) / zoom}`,
-    onWheel,
     onDoubleClick,
     onMouseDown,
   };

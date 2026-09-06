@@ -39,15 +39,14 @@ const GamePage: React.FC<{ error: string | null }> = ({ error }) => {
           </div>
 
           {error && <p className="text-red-600 text-center mt-2">{error}</p>}
-          <button
-            onClick={() => onStartGame(gameRoom.id)}
-            disabled={!canStart}
-            className={`mt-4 w-full py-2.5 px-4 border-0 rounded-md text-[15px] font-semibold text-white ${
-              canStart ? 'bg-blue-500 cursor-pointer' : 'bg-gray-400 cursor-not-allowed'
-            }`}
-          >
-            Start Game
-          </button>
+          {canStart && (
+            <button
+              onClick={() => onStartGame(gameRoom.id)}
+              className="mt-4 w-full py-2.5 px-4 border-0 rounded-md text-[15px] font-semibold text-white bg-blue-500 cursor-pointer"
+            >
+              Start Game
+            </button>
+          )}
           <button
             onClick={() => onRefreshMap(gameRoom.id)}
             className="mt-2 w-full py-2.5 px-4 bg-green-500 text-white border-0 rounded-md cursor-pointer text-sm"

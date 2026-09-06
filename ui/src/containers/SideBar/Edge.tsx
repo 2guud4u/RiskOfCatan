@@ -16,7 +16,7 @@ import { playerColorMap } from '../../utils/soldierPlacement';
 const Edge: React.FC<{ board: Board; edge: EdgeNode }> = ({ board, edge }) => {
   const { gameRoom, currentPlayer, setSelectedObject } = useGameRoom();
   const { buildRoad } = useSocket();
-  const { canBuildRoadOn, roadReason } = useBuildRules(board);
+  const { canBuildRoadOn } = useBuildRules(board);
 
   const road = edge.roadId ? board.roads[edge.roadId] : null;
   const hexes = edge.hexIds.map((hid) => board.hexes[hid]).filter(Boolean);
@@ -54,17 +54,18 @@ const Edge: React.FC<{ board: Board; edge: EdgeNode }> = ({ board, edge }) => {
         ))}
       </div>
 
-      <button
-        onClick={handleBuildRoad}
-        disabled={!canBuildRoad}
-        className={buildButtonClass(canBuildRoad)}
-        title={canBuildRoad ? (hasFreeRoad ? 'Build road (FREE — Road Building card)' : `Build road (${priceLabel(RoadPrice)})`) : roadReason(edge.id)}
-      >
-        Build Road{' '}
-        <span className="text-gray-500 text-xs">
-          {hasFreeRoad ? '(FREE 🛤️)' : `(${priceLabel(RoadPrice)})`}
-        </span>
-      </button>
+      {canBuildRoad && (
+        <button
+          onClick={handleBuildRoad}
+          className={buildButtonClass}
+          title={hasFreeRoad ? 'Build road (FREE — Road Building card)' : `Build road (${priceLabel(RoadPrice)})`}
+        >
+          Build Road{' '}
+          <span className="text-gray-500 text-xs">
+            {hasFreeRoad ? '(FREE 🛤️)' : `(${priceLabel(RoadPrice)})`}
+          </span>
+        </button>
+      )}
 
       <div>
         <div className="text-[13px] font-semibold mb-1.5">Endpoints</div>

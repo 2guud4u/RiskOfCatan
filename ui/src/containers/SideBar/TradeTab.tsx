@@ -40,8 +40,7 @@ const OfferRow: React.FC<{
   offer: TradeOffer;
   mine: boolean;
   canAccept: boolean; // turn-owner gate AND both players can afford their parts
-  acceptReason?: string | null; // why accepting is currently blocked (shown as tooltip)
-}> = ({ offer, mine, canAccept, acceptReason }) => {
+}> = ({ offer, mine, canAccept }) => {
   const { gameRoom } = useGameRoom();
   const { acceptTrade, declineTrade, cancelTrade } = useSocket();
   if (!gameRoom) return null;
@@ -71,17 +70,16 @@ const OfferRow: React.FC<{
             </button>
           ) : (
             <>
-              <button
-                type="button"
-                className={`${btn} ${
-                  canAccept ? 'border-green-700 bg-green-600 text-white' : 'border-gray-300 bg-gray-200 text-gray-500 cursor-not-allowed'
-                }`}
-                disabled={!canAccept}
-                title={canAccept ? 'Accept this trade' : acceptReason ?? 'Cannot accept this trade right now'}
-                onClick={() => acceptTrade(roomId, offer.id)}
-              >
-                Accept
-              </button>
+              {canAccept && (
+                <button
+                  type="button"
+                  className={`${btn} border-green-700 bg-green-600 text-white`}
+                  title="Accept this trade"
+                  onClick={() => acceptTrade(roomId, offer.id)}
+                >
+                  Accept
+                </button>
+              )}
               <button
                 type="button"
                 className={`${btn} border-red-300 bg-red-50 text-red-700`}
@@ -148,10 +146,8 @@ const TradeTab: React.FC = () => {
     setWant({ ...emptyPrice });
   };
 
-  const primaryBtn = (enabled: boolean, active: string) =>
-    `w-full py-1.5 text-[13px] font-semibold rounded-md border ${
-      enabled ? `${active} text-white cursor-pointer` : 'bg-gray-200 text-gray-500 border-gray-300 cursor-not-allowed'
-    }`;
+  const primaryBtn = (active: string) =>
+    `w-full py-1.5 text-[13px] font-semibold rounded-md border ${active} text-white cursor-pointer`;
 
   return (
     <div>
@@ -206,14 +202,15 @@ const TradeTab: React.FC = () => {
               <button type="button" onClick={() => setBankCount((c) => Math.min(currentPlayer.resources[bankGive], c + 1))} className={stepperBtn}>+</button>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={submitBank}
-            disabled={!bankCanTrade}
-            className={primaryBtn(bankCanTrade, 'bg-green-600 border-green-600')}
-          >
-            Trade with Bank
-          </button>
+          {bankCanTrade && (
+            <button
+              type="button"
+              onClick={submitBank}
+              className={primaryBtn('bg-green-600 border-green-600')}
+            >
+              Trade with Bank
+            </button>
+          )}
         </div>
       )}
 
@@ -237,14 +234,15 @@ const TradeTab: React.FC = () => {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={submitOffer}
-            disabled={!isTurnOwner || !hasAnyResource(give)}
-            className={primaryBtn(isTurnOwner && hasAnyResource(give), 'bg-blue-600 border-blue-600')}
-          >
-            Send Offer
-          </button>
+          {isTurnOwner && hasAnyResource(give) && (
+            <button
+              type="button"
+              onClick={submitOffer}
+              className={primaryBtn('bg-blue-600 border-blue-600')}
+            >
+              Send Offer
+            </button>
+          )}
         </div>
       )}
 
@@ -262,7 +260,6 @@ const TradeTab: React.FC = () => {
               offer={o}
               mine={false}
               canAccept={check.allowed}
-              acceptReason={check.reason}
             />
           );
         })
