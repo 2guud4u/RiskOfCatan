@@ -8,13 +8,16 @@ import TradeTab from './TradeTab';
 import BattleTab from './BattleTab';
 import PlayersList from '../PlayersList';
 import ResourceCardsPanel from '../ResourceCardsPanel';
+import DiceView from '../DiceView';
+import EndTurnButton from '../EndTurnButton';
 import { cardClass } from './styles';
 
-type Tab = 'board' | 'players' | 'cards' | 'trade' | 'battle';
+type Tab = 'board' | 'turn' | 'players' | 'cards' | 'trade' | 'battle';
 
 /**
  * Sidebar with tabs: Board (selected vertex/edge viewer, including soldier
- * selection & actions), Players (all players' resources & bonuses), Cards
+ * selection & actions), Turn (current phase & player, dice roll, and the
+ * end-turn control), Players (all players' resources & bonuses), Cards
  * (your resource & development cards), Trade (trade & accept offers on your
  * turn), and Battle (visible while combat is active). The whole panel can be
  * dragged by its grip handle (see DraggablePanel).
@@ -72,6 +75,16 @@ const Sidebar: React.FC<SidebarProps> = ({ layout, onMeasure }) => {
     switch (tab) {
       case 'board':
         return renderBoardTab();
+      case 'turn':
+        return (
+          <div className="flex flex-col gap-3">
+            <div className="text-[13px] font-semibold text-gray-700">
+              {gameRoom.turnState.phase} {'—'} {gameRoom.turnState.player}
+            </div>
+            <DiceView />
+            <EndTurnButton />
+          </div>
+        );
       case 'players':
         return (
           <PlayersList
@@ -95,6 +108,9 @@ const Sidebar: React.FC<SidebarProps> = ({ layout, onMeasure }) => {
         <div className="flex -mt-1 shrink-0">
           <button type="button" className={tabClass(tab === 'board')} onClick={() => switchTab('board')}>
             Board
+          </button>
+          <button type="button" className={tabClass(tab === 'turn')} onClick={() => switchTab('turn')}>
+            Turn
           </button>
           <button type="button" className={tabClass(tab === 'players')} onClick={() => switchTab('players')}>
             Players

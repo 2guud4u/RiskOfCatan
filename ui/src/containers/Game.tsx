@@ -2,8 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useGameRoom } from '../contexts/GameContext';
 import BoardView from './BoardView';
 import Sidebar from './SideBar/Index';
-import EndTurnButton from './EndTurnButton';
-import DiceView from './DiceView';
 import RobberPrompt from './RobberPrompt';
 import StealPrompt from './StealPrompt';
 import DevCardPrompt from './DevCardPrompt';
@@ -13,21 +11,17 @@ import DraggablePanel from '../components/DraggablePanel';
 import { resetAllPanels } from '../components/DraggablePanel';
 import { GAME_HEX_SIZE } from 'common';
 import { DefaultRect } from '../types';
-import { LAYOUT_GAP, RAIL_W, SIDEBAR_W } from '../constants';
+import { SIDEBAR_W } from '../constants';
 
 /**
  * The game screen. Everything is floating: the board panel filling the
- * left area edge-to-edge, the sidebar in its own column (with tabs for
- * board, players, cards, trade, and battle), and a right rail of panels
- * (turn, dice) stacked at cumulative y-positions computed from their
- * measured natural heights (default height = natural content height, so
- * nothing is ever clipped). The dice card only appears while the current
- * player needs to roll. Dragging a panel moves only that panel — the
- * others never reflow.
+ * left area edge-to-edge, and the sidebar in its own column (with tabs
+ * for board, turn, players, cards, trade, and battle). The board and
+ * sidebar are positioned from the viewport, so they track window resizes.
+ * Dragging a panel moves only that panel — the others never reflow.
  */
 const Game: React.FC = () => {
   const { gameRoom, currentPlayer } = useGameRoom();
-  const [measured, setMeasured] = useState<Record<string, { w: number; h: number }>>({});
   const [vp, setVp] = useState({ vw: window.innerWidth, vh: window.innerHeight });
 
   useEffect(() => {
@@ -36,40 +30,18 @@ const Game: React.FC = () => {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  const handleMeasure = (id: string) => (s: { w: number; h: number }) => {
-    setMeasured((m) => (m[id] && m[id].w === s.w && m[id].h === s.h ? m : { ...m, [id]: s }));
-  };
-
   const layouts = useMemo(() => {
     const { vw, vh } = vp;
     const out: Record<string, DefaultRect | null> = {};
     // Board: fills the left area edge-to-edge (the board SVG scales to fit).
-    out.board = { x: 0, y: 0, w: Math.max(200, vw - SIDEBAR_W - RAIL_W), h: vh };
+    out.board = { x: 0, y: 0, w: Math.max(200, vw - SIDEBAR_W), h: vh };
     // Sidebar: its own column, full height.
-    out.sidebar = { x: vw - RAIL_W - SIDEBAR_W, y: 0, w: SIDEBAR_W, h: vh };
-    // Right rail: turn, dice (only while rolling).
-    // Cumulative y from the measured natural heights; a panel is placed
-    // once every panel above it has reported its height.
-    const railIds = ['turn', 'dice'];
-    const railX = vw - RAIL_W;
-    let y = 0;
-    for (const id of railIds) {
-      const h = measured[id]?.h;
-      if (h == null) break;
-      out[id] = { x: railX, y, w: RAIL_W, h };
-      y += h + LAYOUT_GAP;
-    }
+    out.sidebar = { x: vw - SIDEBAR_W, y: 0, w: SIDEBAR_W, h: vh };
     return out;
-  }, [vp, measured]);
+  }, [vp]);
   if (!gameRoom || !currentPlayer) {
     return <p className="text-center text-gray-500">Loading game...</p>;
   }
-
-  const turn = gameRoom.turnState;
-  const rollTotal =
-    gameRoom.roll.die1 !== null && gameRoom.roll.die2 !== null
-      ? gameRoom.roll.die1 + gameRoom.roll.die2
-      : null;
 
   return (
     <div className="min-h-screen">
@@ -88,26 +60,11 @@ const Game: React.FC = () => {
         id="board"
         className="bg-white rounded-lg shadow"
         layout={layouts.board}
-        onMeasure={handleMeasure('board')}
       >
         <BoardView hexSize={GAME_HEX_SIZE} />
       </DraggablePanel>
 
-      <DraggablePanel id="turn" className="bg-white rounded-lg shadow p-3 z-30" layout={layouts.turn} onMeasure={handleMeasure('turn')} followContent>
-        <div className="mb-2">
-          <span className="text-[13px] font-semibold text-gray-700">
-            {turn.phase} {'—'} {turn.player}
-            {rollTotal !== null && (
-              <span className="font-normal text-gray-400"> · roll {rollTotal}</span>
-            )}
-          </span>
-        </div>
-        <EndTurnButton />
-      </DraggablePanel>
-      <DraggablePanel id="dice" className="bg-white rounded-lg shadow p-3 z-30" layout={layouts.dice} onMeasure={handleMeasure('dice')} followContent>
-        <DiceView />
-      </DraggablePanel>
-      <Sidebar layout={layouts.sidebar} onMeasure={handleMeasure('sidebar')} />
+      <Sidebar layout={layouts.sidebar} />
 
       {/* Steal prompt: the thief picks a face-down card from a victim. */}
       <StealPrompt />

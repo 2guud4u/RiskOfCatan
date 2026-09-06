@@ -101,10 +101,6 @@ export const PORT_WATER = '#cfe8f7';
 
 // ── Game (layout) ──────────────────────────────────────────────────────────
 
-/** Gap between floating panels. */
-export const LAYOUT_GAP = 8;
-/** Width of the board rail. */
-export const RAIL_W = 280;
 /** Width of the sidebar. */
 export const SIDEBAR_W = 280;
 
