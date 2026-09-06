@@ -296,7 +296,7 @@ const BoardView: React.FC<BoardViewProps> = ({ hexSize }) => {
           width={renderSize}
           height={renderSize}
           viewBox={viewport.viewBox}
-          className="block mx-auto"
+          className="block w-full"
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={() => {

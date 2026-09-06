@@ -43,8 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({ layout, onMeasure }) => {
   ).length;
 
   const tabClass = (active: boolean): string =>
-    `flex-1 py-1.5 text-[13px] font-semibold border-b-2 cursor-pointer ${
-      active ? 'border-blue-600 text-blue-700' : 'border-transparent text-gray-500 hover:text-gray-700'
+    `flex-1 py-1.5 text-[13px] font-semibold border-b-2 cursor-pointer ${active ? 'border-blue-600 text-blue-700' : 'border-transparent text-gray-500 hover:text-gray-700'
     }`;
 
   const switchTab = (next: Tab) => {
@@ -112,9 +111,6 @@ const Sidebar: React.FC<SidebarProps> = ({ layout, onMeasure }) => {
           <button type="button" className={tabClass(tab === 'turn')} onClick={() => switchTab('turn')}>
             Turn
           </button>
-          <button type="button" className={tabClass(tab === 'players')} onClick={() => switchTab('players')}>
-            Players
-          </button>
           <button type="button" className={tabClass(tab === 'cards')} onClick={() => switchTab('cards')}>
             Cards
           </button>
@@ -124,6 +120,9 @@ const Sidebar: React.FC<SidebarProps> = ({ layout, onMeasure }) => {
                 {incomingCount}
               </span>
             )}
+          </button>
+          <button type="button" className={tabClass(tab === 'players')} onClick={() => switchTab('players')}>
+            Players
           </button>
           {battle && (
             <button type="button" className={tabClass(tab === 'battle')} onClick={() => switchTab('battle')}>
