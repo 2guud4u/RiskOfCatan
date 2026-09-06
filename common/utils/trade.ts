@@ -39,9 +39,14 @@ export function addPrice(resources: Price, price: Price): Price {
   return out;
 }
 
+/** The player who rolled the dice this round (the turn owner). */
+export function diceOwner(room: GameRoom): string {
+  return room.turnState.playerOrder[room.turnState.dicePlayerIndex];
+}
+
 /**
  * Check whether a trade offer may be created.
- * Any player in the room may draft an offer at any time.
+ * Only the turn owner (the player who rolled the dice) may draft an offer.
  */
 export function canCreateTradeOffer(
   room: GameRoom,
@@ -50,6 +55,8 @@ export function canCreateTradeOffer(
   give: Price,
   want: Price
 ): TradeCheck {
+  if (diceOwner(room) !== fromName)
+    return { allowed: false, reason: 'You can only trade during your turn' };
   const from = room.players.find((p) => p.name === fromName);
   if (!from) return { allowed: false, reason: 'You are not in this room' };
   if (fromName === toName) return { allowed: false, reason: 'Cannot trade with yourself' };
@@ -62,17 +69,16 @@ export function canCreateTradeOffer(
 
 /**
  * Check whether a trade offer may be accepted.
- * Only the recipient may accept, and only while EITHER player in the trade
- * is in their Trade phase.
+ * Only the recipient may accept, and only while the offer is still pending.
+ * An offer may be accepted during the turn owner's turn — i.e. while either
+ * player in the trade is the turn owner (the player who rolled the dice).
  */
 export function canAcceptTradeOffer(room: GameRoom, offer: TradeOffer, playerName: string): TradeCheck {
   if (offer.to !== playerName) return { allowed: false, reason: 'Only the recipient can accept this trade' };
   if (offer.status !== 'pending') return { allowed: false, reason: 'This trade is no longer pending' };
-  const inTradePhase = room.turnState.phase === 'Trade';
-  const eitherPlayerTrading =
-    room.turnState.player === offer.from || room.turnState.player === offer.to;
-  if (!inTradePhase || !eitherPlayerTrading)
-    return { allowed: false, reason: 'You can only accept trades while either player is in their Trade phase' };
+  const owner = diceOwner(room);
+  if (owner !== offer.from && owner !== offer.to)
+    return { allowed: false, reason: 'You can only accept trades during the turn owner\'s turn' };
   const from = room.players.find((p) => p.name === offer.from);
   const to = room.players.find((p) => p.name === offer.to);
   if (!from || !to) return { allowed: false, reason: 'A trade participant is missing' };
@@ -155,6 +161,8 @@ export function canBankTrade(
   giveCount: number,
   supply?: Record<ResourceKey, number>
 ): TradeCheck {
+  if (diceOwner(room) !== playerName)
+    return { allowed: false, reason: 'You can only trade with the bank during your turn' };
   if (giveResource === wantResource) {
     return { allowed: false, reason: 'Cannot trade a resource for itself' };
   }

@@ -488,7 +488,7 @@ export function setupSocketHandlers(io: Server): void {
 
       // When both dice are in: a 7 holds the Dice phase until the robber is
       // moved (no payout — no hex carries a 7 token); any other total pays
-      // out resources and advances to the Trade phase automatically.
+      // out resources and advances to the Build phase automatically.
       if (room.roll.die1 !== null && room.roll.die2 !== null) {
         const total = rollTotal(room.roll.die1, room.roll.die2);
         if (total === 7) {

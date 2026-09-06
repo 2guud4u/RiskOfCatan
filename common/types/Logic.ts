@@ -7,7 +7,7 @@ import { Resource } from './Hex';
  */
 
 export interface TurnState {
-  phase: 'SetUp' | 'Dice' | 'Trade' | 'Build' | 'Action';
+  phase: 'SetUp' | 'Dice' | 'Build' | 'Action';
   player: string;
   playerOrder: string[];
   offset: number;

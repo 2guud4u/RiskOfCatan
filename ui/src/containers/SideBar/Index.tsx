@@ -12,8 +12,8 @@ type Tab = 'board' | 'trade' | 'battle';
 
 /**
  * Sidebar with tabs: Board (selected vertex/edge viewer, including soldier
- * selection & actions), Trade (draft offers anytime, accept on your turn),
- * and Battle (visible while combat is active). The whole panel can be dragged
+ * selection & actions), Trade (trade & accept offers on your turn), and Battle
+ * (visible while combat is active). The whole panel can be dragged
  * by its grip handle (see DraggablePanel).
  */
 interface SidebarProps {

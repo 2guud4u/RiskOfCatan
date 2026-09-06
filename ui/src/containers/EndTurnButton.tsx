@@ -14,8 +14,6 @@ const EndTurnButton: React.FC = () => {
   // Label for the manual-advance phases (derived at render time).
   const phaseText = (phase: string): string => {
     switch (phase) {
-      case 'Trade':
-        return 'End Trade Phase';
       case 'Build':
         return 'End Build Phase';
       case 'Action':

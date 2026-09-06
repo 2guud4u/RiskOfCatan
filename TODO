@@ -21,3 +21,15 @@ allow dragging of soldiers in the mini map
 add port trades
 
 clean up repo
+
+Feature:
+undo button for buying stuff and moving soldier
+less clutter remove disabled options
+trade and build 
+after dice roll, keep result there
+fighting injured soldier logic
+
+
+Bug: 
+built roads when didnt have enough resources(brick speciificaly)
+

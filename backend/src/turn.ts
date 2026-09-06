@@ -58,11 +58,6 @@ export function advanceTurn(room: GameRoom): void {
     }
 
     case 'Dice':
-      // Same player continues to Trade phase.
-      room.turnState = { ...turnState, phase: 'Trade' };
-      break;
-
-    case 'Trade':
       // Same player continues to Build phase, reset offset for all players.
       room.turnState = { ...turnState, phase: 'Build', offset: 0 };
       break;
