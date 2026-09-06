@@ -6,10 +6,10 @@ import Vertex from './Vertex';
 import Edge from './Edge';
 import TradeTab from './TradeTab';
 import BattleTab from './BattleTab';
-import PlayersList from '../PlayersList';
-import ResourceCardsPanel from '../ResourceCardsPanel';
-import DiceView from '../DiceView';
-import EndTurnButton from '../EndTurnButton';
+import PlayersList from './PlayersList';
+import ResourceCardsPanel from './ResourceCardsPanel';
+import DiceView from './DiceView';
+import EndTurnButton from './EndTurnButton';
 import { cardClass } from './styles';
 
 type Tab = 'board' | 'turn' | 'players' | 'cards' | 'trade' | 'battle';

@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { SoldierBattleState, activeSoldiersOf } from 'common';
 import { useGameRoom } from '../contexts/GameContext';
 import { useSocket } from '../contexts/SocketContext';
-import MiniView from './SideBar/MiniView';
+import MiniView from '../components/MiniView';
 import { playerColorMap } from '../utils/soldierPlacement';
 import {
   COL_W,

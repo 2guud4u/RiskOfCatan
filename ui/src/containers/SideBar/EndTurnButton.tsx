@@ -1,6 +1,6 @@
 import React from 'react';
-import { useGameRoom } from '../contexts/GameContext';
-import { useSocket } from '../contexts/SocketContext';
+import { useGameRoom } from '../../contexts/GameContext';
+import { useSocket } from '../../contexts/SocketContext';
 
 /**
  * Turn controls. SetUp and Dice phases advance automatically (setup once the

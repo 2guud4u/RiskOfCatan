@@ -1,8 +1,8 @@
 import React from 'react';
 import { canAfford, DEVELOPMENT_CARD_META, DevelopmentCardPrice, Player } from 'common';
-import { useGameRoom } from '../contexts/GameContext';
-import { useSocket } from '../contexts/SocketContext';
-import { RESOURCE_ICONS } from '../utils/resourceIcons';
+import { useGameRoom } from '../../contexts/GameContext';
+import { useSocket } from '../../contexts/SocketContext';
+import { RESOURCE_ICONS } from '../../utils/resourceIcons';
 
 /**
  * Personal hand panel: shows the current player's resources as individual

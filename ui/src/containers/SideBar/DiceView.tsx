@@ -1,9 +1,9 @@
 import React from 'react';
 import { Board, Price, RollResult, computePayouts } from 'common';
-import { useGameRoom } from '../contexts/GameContext';
-import { useSocket } from '../contexts/SocketContext';
-import { priceLabel } from '../utils/price';
-import { emptyPrice } from '../constants';
+import { useGameRoom } from '../../contexts/GameContext';
+import { useSocket } from '../../contexts/SocketContext';
+import { priceLabel } from '../../utils/price';
+import { emptyPrice } from '../../constants';
 
 /** Total of the two dice, or null until both are rolled. */
 const rollTotal = (roll: RollResult): number | null =>

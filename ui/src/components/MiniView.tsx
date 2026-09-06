@@ -1,8 +1,8 @@
 import React, { RefObject } from 'react';
 import { Board, EdgeNode, GAME_HEX_SIZE, terrainColors, VertexNode, cubeToPixel } from 'common';
-import { hexPointsAt } from '../../utils/hex';
-import { SOLDIERS_PER_ROW, groupSoldiersByOwner, ownerAngle } from '../../utils/soldierPlacement';
-import { RANK_OFFSET, RANK_SPACING, SOLDIER_SPACING } from '../../constants';
+import { hexPointsAt } from '../utils/hex';
+import { SOLDIERS_PER_ROW, groupSoldiersByOwner, ownerAngle } from '../utils/soldierPlacement';
+import { RANK_OFFSET, RANK_SPACING, SOLDIER_SPACING } from '../constants';
 
 interface MiniViewProps {
   board: Board;

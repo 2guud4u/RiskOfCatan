@@ -2,7 +2,7 @@ import React from 'react';
 import { Board, EdgeNode, RoadPrice } from 'common';
 import { useGameRoom } from '../../contexts/GameContext';
 import { useSocket } from '../../contexts/SocketContext';
-import MiniView from './MiniView';
+import MiniView from '../../components/MiniView';
 import { useBuildRules } from './useBuildRules';
 import { priceLabel } from '../../utils/price';
 import { buildButtonClass, hexChipClass } from './styles';

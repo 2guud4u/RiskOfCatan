@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Board, CityPrice, SettlementPrice, SoldierObj, SoldierPrice, VertexNode } from 'common';
 import { useGameRoom } from '../../contexts/GameContext';
 import { useSocket } from '../../contexts/SocketContext';
-import MiniView from './MiniView';
+import MiniView from '../../components/MiniView';
 import { useBuildRules } from './useBuildRules';
 import { buildButtonClass, hexChipClass } from './styles';
 import { playerColorMap } from '../../utils/soldierPlacement';
