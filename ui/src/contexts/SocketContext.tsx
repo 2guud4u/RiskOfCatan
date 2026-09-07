@@ -47,6 +47,7 @@ interface SocketContextType {
   resetGame: (roomId: string) => void;
   refreshMap: (roomId: string) => void;
   endTurn: (roomId: string) => void;
+  undoBuild: (roomId: string) => void;
   drawDevelopmentCard: (playerId: string, roomId: string) => void;
   playDevelopmentCard: (playerId: string, roomId: string, cardIndex: number) => void;
   createTradeOffer: (roomId: string, to: string, give: Price, want: Price) => void;
@@ -82,6 +83,7 @@ const SocketContext = createContext<SocketContextType>({
   resetGame: () => { },
   refreshMap: () => { },
   endTurn: () => { },
+  undoBuild: () => { },
   drawDevelopmentCard: () => { },
   playDevelopmentCard: () => { },
   createTradeOffer: () => { },
@@ -145,6 +147,8 @@ const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =
     emitAction(socket, 'exitBattle', { roomId }, { requirePlayerId: false });
 
   const endTurn = (roomId: string) => emitAction(socket, 'endTurn', { roomId });
+
+  const undoBuild = (roomId: string) => emitAction(socket, 'undoBuild', { roomId });
 
   const drawDevelopmentCard = (playerId: string, roomId: string) =>
     emitAction(socket, 'drawDevelopmentCard', { roomId, playerId }, { requirePlayerId: true });
@@ -232,6 +236,7 @@ const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =
         resetGame,
         refreshMap,
         endTurn,
+        undoBuild,
         drawDevelopmentCard,
         playDevelopmentCard,
         createTradeOffer,

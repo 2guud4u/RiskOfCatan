@@ -20,7 +20,51 @@ export interface TurnState {
   soldiersCreatedThisTurn: string[];
   /** Soldier IDs healed this turn (cannot move same turn). */
   soldiersHealedThisTurn: string[];
+  /** Undoable actions taken by the acting player this phase (cleared on every advance). */
+  undoLog: UndoEntry[];
 }
+
+/**
+ * One undoable action by the acting player. Each entry captures exactly what
+ * is needed to reverse that action. The log is cleared on every `advanceTurn`,
+ * so it holds only the current acting player's current-phase actions — which
+ * is precisely the "lock out once my turn ends" rule.
+ */
+export type UndoEntry =
+  | {
+      kind: 'buildSettlement';
+      settlementId: string;
+      /** Garrisoned soldier spawned with the settlement (deleted on undo). */
+      soldierId: string;
+      vertexId: string;
+      /** True if the settlement cost was deducted (Build phase, not free setup). */
+      paid: boolean;
+    }
+  | {
+      kind: 'buildRoad';
+      roadId: string;
+      edgeId: string;
+      /** True if a free road (Road Building card) was used instead of resources. */
+      usedFreeRoad: boolean;
+      /** True if the road cost was deducted (Build phase, not free setup). */
+      paid: boolean;
+    }
+  | {
+      kind: 'upgradeCity';
+      settlementId: string;
+      /** Extra garrisoned soldier spawned by the upgrade (deleted on undo). */
+      soldierId: string;
+    }
+  | {
+      kind: 'buildSoldier';
+      soldierId: string;
+    }
+  | {
+      kind: 'moveSoldier';
+      soldierId: string;
+      /** The vertex the soldier was on before the move (restored on undo). */
+      originalVertexId: string;
+    };
 
 /** A pending resource trade between two players. */
 export interface TradeOffer {

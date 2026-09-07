@@ -29,6 +29,7 @@ export function advanceTurn(room: GameRoom): void {
           offset: 0,
           placedSettlement: null,
           placedRoad: null,
+          undoLog: [],
         };
         room.roll = { die1: null, die2: null };
         turnState.dicePlayerIndex = 0;
@@ -52,6 +53,7 @@ export function advanceTurn(room: GameRoom): void {
           offset: nextOffset,
           placedSettlement: false,
           placedRoad: false,
+          undoLog: [],
         };
       }
       break;
@@ -59,7 +61,7 @@ export function advanceTurn(room: GameRoom): void {
 
     case 'Dice':
       // Same player continues to Build phase, reset offset for all players.
-      room.turnState = { ...turnState, phase: 'Build', offset: 0 };
+      room.turnState = { ...turnState, phase: 'Build', offset: 0, undoLog: [] };
       break;
 
     case 'Build':
@@ -70,6 +72,7 @@ export function advanceTurn(room: GameRoom): void {
           player: turnState.playerOrder[turnState.dicePlayerIndex],
           phase: 'Action',
           offset: 0,
+          undoLog: [],
         };
       } else {
         // Next player's turn to build.
@@ -78,6 +81,7 @@ export function advanceTurn(room: GameRoom): void {
           ...turnState,
           player: turnState.playerOrder[nextPlayerIndex],
           offset: turnState.offset + 1,
+          undoLog: [],
         };
       }
       break;
@@ -95,6 +99,7 @@ export function advanceTurn(room: GameRoom): void {
           soldiersActedThisTurn: [],
           soldiersCreatedThisTurn: [],
           soldiersHealedThisTurn: [],
+          undoLog: [],
         };
         room.roll = { die1: null, die2: null };
       } else {
@@ -104,6 +109,7 @@ export function advanceTurn(room: GameRoom): void {
           ...turnState,
           player: turnState.playerOrder[nextPlayerIndex],
           offset: turnState.offset + 1,
+          undoLog: [],
         };
       }
       break;

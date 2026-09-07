@@ -42,6 +42,7 @@ export function createGameRoom(roomId: string, firstPlayerName: string): GameRoo
       soldiersActedThisTurn: [],
       soldiersCreatedThisTurn: [],
       soldiersHealedThisTurn: [],
+      undoLog: [],
     },
     gameStatus: 'waiting',
     winner: null,

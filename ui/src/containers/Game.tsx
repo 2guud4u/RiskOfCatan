@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useGameRoom } from '../contexts/GameContext';
+import { useSocket } from '../contexts/SocketContext';
 import BoardView from './BoardView';
 import Sidebar from './SideBar/Index';
 import EndTurnButton from './SideBar/EndTurnButton';
@@ -40,6 +41,7 @@ const phaseColor = (phase: string): string => {
 
 const Game: React.FC = () => {
   const { gameRoom, currentPlayer, setGameRoom, setCurrentPlayer } = useGameRoom();
+  const { undoBuild } = useSocket();
   const [vp, setVp] = useState({ vw: window.innerWidth, vh: window.innerHeight });
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -66,6 +68,13 @@ const Game: React.FC = () => {
   if (!gameRoom || !currentPlayer) {
     return <p className="text-center text-gray-500">Loading game...</p>;
   }
+
+  // Undo is available only while it is this player's turn, in the Build or
+  // Action phase, and there is at least one action this phase to undo.
+  const canUndo =
+    gameRoom.turnState.player === currentPlayer.name &&
+    (gameRoom.turnState.phase === 'Build' || gameRoom.turnState.phase === 'Action') &&
+    (gameRoom.turnState.undoLog?.length ?? 0) > 0;
 
   return (
     <div className="min-h-screen">
@@ -144,8 +153,18 @@ const Game: React.FC = () => {
           <span className="px-2 py-0.5 rounded-md bg-white/20 text-[11px] font-bold uppercase tracking-wide">
             {gameRoom.turnState.phase}
           </span>
-          <span className="text-[13px] font-semibold">{gameRoom.turnState.player}</span>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            {canUndo && (
+              <button
+                type="button"
+                onClick={() => undoBuild(gameRoom.id)}
+                className="px-2.5 py-1.5 text-[13px] font-semibold rounded-md bg-white/25 cursor-pointer hover:bg-white/40"
+                title="Undo last action"
+                aria-label="Undo last action"
+              >
+                {'↶'} Undo
+              </button>
+            )}
             <EndTurnButton variant="snackbar" />
           </div>
         </div>

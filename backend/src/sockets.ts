@@ -3,6 +3,7 @@ import {
   Board,
   BattleState,
   Player,
+  TurnState,
   PLAYER_COLORS,
   computePayouts,
   rollTotal,
@@ -30,6 +31,7 @@ import {
   canAcceptTradeOffer,
   applyTrade,
   subtractPrice,
+  addPrice,
   SettlementPrice,
   RoadPrice,
   CityPrice,
@@ -50,6 +52,12 @@ import { advanceTurn } from './turn';
  * in-memory `gameRooms` store and delegate turn transitions to `advanceTurn`.
  */
 export function setupSocketHandlers(io: Server): void {
+  /** Remove a soldier id from the per-turn tracking arrays (used by undo). */
+  const removeSoldierTracking = (turnState: TurnState, soldierId: string): void => {
+    turnState.soldiersCreatedThisTurn = turnState.soldiersCreatedThisTurn.filter((id) => id !== soldierId);
+    turnState.soldiersActedThisTurn = turnState.soldiersActedThisTurn.filter((id) => id !== soldierId);
+  };
+
   io.on('connection', (socket: Socket) => {
 
     // Join or create a game room.
@@ -443,6 +451,94 @@ export function setupSocketHandlers(io: Server): void {
       io.to(roomId).emit('gameUpdate', room);
     });
 
+    // Undo the acting player's most recent action this phase (build or action).
+    // Locked out once their turn advances: the log is cleared on every
+    // `advanceTurn`, and the phase must match the entry kind.
+    socket.on('undoBuild', (data: { roomId: string }) => {
+      const { roomId } = data;
+      const room = gameRooms.get(roomId);
+      if (!room) {
+        socket.emit('error', { message: 'Room not found' });
+        return;
+      }
+      const board = room.board;
+      if (!board) {
+        socket.emit('error', { message: 'Game board is not available' });
+        return;
+      }
+      const turnState = room.turnState;
+      const entry = turnState.undoLog[turnState.undoLog.length - 1];
+      if (!entry) {
+        socket.emit('error', { message: 'Nothing to undo' });
+        return;
+      }
+      // Build-phase actions undo only during Build; action-phase actions only
+      // during Action. A mismatch means the acting player's turn has ended.
+      const isBuildEntry =
+        entry.kind === 'buildSettlement' || entry.kind === 'buildRoad' || entry.kind === 'upgradeCity';
+      if (turnState.phase !== (isBuildEntry ? 'Build' : 'Action')) {
+        socket.emit('error', { message: 'Cannot undo after the turn has ended' });
+        return;
+      }
+      const actingPlayer = room.players.find((p) => p.name === turnState.player);
+      if (!actingPlayer) {
+        socket.emit('error', { message: 'Acting player not found' });
+        return;
+      }
+
+      // Pop the entry, then reverse its effects.
+      turnState.undoLog.pop();
+      switch (entry.kind) {
+        case 'buildSettlement': {
+          if (entry.paid) actingPlayer.resources = addPrice(actingPlayer.resources, SettlementPrice);
+          delete board.settlements[entry.settlementId];
+          const vertex = board.vertices[entry.vertexId];
+          if (vertex && vertex.settlementId === entry.settlementId) vertex.settlementId = null;
+          delete board.soldiers[entry.soldierId];
+          removeSoldierTracking(turnState, entry.soldierId);
+          break;
+        }
+        case 'buildRoad': {
+          if (entry.usedFreeRoad) actingPlayer.freeRoadsLeft += 1;
+          else if (entry.paid) actingPlayer.resources = addPrice(actingPlayer.resources, RoadPrice);
+          delete board.roads[entry.roadId];
+          const edge = board.edges[entry.edgeId];
+          if (edge && edge.roadId === entry.roadId) edge.roadId = null;
+          for (const vid of [edge?.vertexAId, edge?.vertexBId]) {
+            const v = vid ? board.vertices[vid] : undefined;
+            if (v) v.roadIds = v.roadIds.filter((id) => id !== entry.edgeId);
+          }
+          break;
+        }
+        case 'upgradeCity': {
+          actingPlayer.resources = addPrice(actingPlayer.resources, CityPrice);
+          const settlement = board.settlements[entry.settlementId];
+          if (settlement) settlement.level = 'settlement';
+          delete board.soldiers[entry.soldierId];
+          removeSoldierTracking(turnState, entry.soldierId);
+          break;
+        }
+        case 'buildSoldier': {
+          actingPlayer.resources = addPrice(actingPlayer.resources, SoldierPrice);
+          delete board.soldiers[entry.soldierId];
+          removeSoldierTracking(turnState, entry.soldierId);
+          break;
+        }
+        case 'moveSoldier': {
+          const soldier = board.soldiers[entry.soldierId];
+          if (soldier) soldier.vertexId = entry.originalVertexId;
+          // Refund the action so the soldier can move/attack again this phase.
+          turnState.soldiersActedThisTurn = turnState.soldiersActedThisTurn.filter(
+            (id) => id !== entry.soldierId,
+          );
+          break;
+        }
+      }
+
+      applyBonuses(room);
+      io.to(roomId).emit('gameUpdate', { ...room });
+    });
+
     socket.on('rollDice', (data: { roomId: string }) => {
       const { roomId } = data;
       const room = gameRooms.get(roomId);
@@ -661,6 +757,17 @@ export function setupSocketHandlers(io: Server): void {
       // Update the game state.
       turnState.placedSettlement = true;
 
+      // Record the build so it can be undone (refunds the cost, deletes the
+      // settlement and its garrisoned soldier). Free setup placements are
+      // cleared by the auto-advance below, so only paid Build builds persist.
+      turnState.undoLog.push({
+        kind: 'buildSettlement',
+        settlementId: newSettlementId,
+        soldierId: newSoldierId,
+        vertexId,
+        paid: turnState.phase === 'Build',
+      });
+
       // In SetUp, auto-advance once both a settlement and a road are placed.
       if (room.turnState.phase === 'SetUp' && room.turnState.placedSettlement && room.turnState.placedRoad) {
         advanceTurn(room);
@@ -727,7 +834,16 @@ export function setupSocketHandlers(io: Server): void {
 
       turnState.placedRoad = true;
 
-      // In SetUp, auto-advance once both a settlement and a road are placed.
+      // Record the road so it can be undone (refunds the cost or restores the
+      // free road, deletes the road). Free setup placements are cleared by the
+      // auto-advance below.
+      turnState.undoLog.push({
+        kind: 'buildRoad',
+        roadId: newRoadId,
+        edgeId,
+        usedFreeRoad: usingFreeRoad,
+        paid: turnState.phase === 'Build',
+      });
       if (room.turnState.phase === 'SetUp' && room.turnState.placedSettlement && room.turnState.placedRoad) {
         advanceTurn(room);
       }
@@ -785,6 +901,14 @@ export function setupSocketHandlers(io: Server): void {
       turnState.soldiersCreatedThisTurn.push(newSoldierId);
       turnState.soldiersActedThisTurn.push(newSoldierId);
 
+      // Record the upgrade so it can be undone (refunds the cost, reverts the
+      // settlement to a settlement, deletes the extra garrisoned soldier).
+      turnState.undoLog.push({
+        kind: 'upgradeCity',
+        settlementId: vertex?.settlementId ?? '',
+        soldierId: newSoldierId,
+      });
+
       applyBonuses(room);
       io.to(roomId).emit('gameUpdate', { ...room });
     });
@@ -833,6 +957,13 @@ export function setupSocketHandlers(io: Server): void {
       // A freshly built soldier has used its action for this phase.
       turnState.soldiersActedThisTurn.push(newSoldierId);
 
+      // Record the build so it can be undone (refunds the cost, deletes the
+      // soldier, and clears its tracking so it is no longer considered built).
+      turnState.undoLog.push({
+        kind: 'buildSoldier',
+        soldierId: newSoldierId,
+      });
+
       applyBonuses(room);
       io.to(roomId).emit('gameUpdate', { ...room });
     });
@@ -866,7 +997,16 @@ export function setupSocketHandlers(io: Server): void {
       // Move the soldier to the new vertex.
       const soldier = board.soldiers[soldierId];
       if (soldier) {
+        const originalVertexId = soldier.vertexId;
         soldier.vertexId = targetVertexId;
+
+        // Record the move so it can be undone (returns the soldier to its
+        // original vertex and refunds its action for this phase).
+        turnState.undoLog.push({
+          kind: 'moveSoldier',
+          soldierId,
+          originalVertexId,
+        });
       }
 
       // Each soldier gets one action per Action phase (Rules.md line 30).
