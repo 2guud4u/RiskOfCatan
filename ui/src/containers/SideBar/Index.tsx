@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useGameRoom } from '../../contexts/GameContext';
 import DraggablePanel from '../../components/DraggablePanel';
 import { DefaultRect } from '../../types';
@@ -11,16 +11,16 @@ import ResourceCardsPanel from './ResourceCardsPanel';
 import DiceView from './DiceView';
 import EndTurnButton from './EndTurnButton';
 import { cardClass } from './styles';
-
-type Tab = 'board' | 'turn' | 'players' | 'cards' | 'trade' | 'battle';
+type Tab = 'board' | 'dice' | 'players' | 'cards' | 'trade' | 'battle';
 
 /**
  * Sidebar with tabs: Board (selected vertex/edge viewer, including soldier
- * selection & actions), Turn (current phase & player, dice roll, and the
- * end-turn control), Players (all players' resources & bonuses), Cards
- * (your resource & development cards), Trade (trade & accept offers on your
- * turn), and Battle (visible while combat is active). The whole panel can be
- * dragged by its grip handle (see DraggablePanel).
+ * selection & actions), Dice (dice roll and the end-turn control), Players
+ * (all players' resources & bonuses), Cards (your resource & development
+ * cards), Trade (trade & accept offers on your turn), and Battle (visible
+ * while combat is active). The current phase & player live in the turn
+ * snackbar. The whole panel can be dragged by its grip handle (see
+ * DraggablePanel).
  */
 interface SidebarProps {
   layout: DefaultRect | null;
@@ -31,6 +31,11 @@ const Sidebar: React.FC<SidebarProps> = ({ layout, onMeasure }) => {
   const [tab, setTab] = React.useState<Tab>('board');
   const { gameRoom, currentPlayer, selectedObject } = useGameRoom();
   const board = gameRoom?.board ?? null;
+
+  // Selecting a vertex or edge on the board jumps the sidebar to the Board tab.
+  useEffect(() => {
+    if (selectedObject) setTab('board');
+  }, [selectedObject]);
 
   if (!gameRoom || !currentPlayer || !board) {
     return null;
@@ -74,12 +79,9 @@ const Sidebar: React.FC<SidebarProps> = ({ layout, onMeasure }) => {
     switch (tab) {
       case 'board':
         return renderBoardTab();
-      case 'turn':
+      case 'dice':
         return (
           <div className="flex flex-col gap-3">
-            <div className="text-[13px] font-semibold text-gray-700">
-              {gameRoom.turnState.phase} {'—'} {gameRoom.turnState.player}
-            </div>
             <DiceView />
             <EndTurnButton />
           </div>
@@ -108,8 +110,8 @@ const Sidebar: React.FC<SidebarProps> = ({ layout, onMeasure }) => {
           <button type="button" className={tabClass(tab === 'board')} onClick={() => switchTab('board')}>
             Board
           </button>
-          <button type="button" className={tabClass(tab === 'turn')} onClick={() => switchTab('turn')}>
-            Turn
+          <button type="button" className={tabClass(tab === 'dice')} onClick={() => switchTab('dice')}>
+            Dice
           </button>
           <button type="button" className={tabClass(tab === 'cards')} onClick={() => switchTab('cards')}>
             Cards

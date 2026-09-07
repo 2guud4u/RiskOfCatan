@@ -7,9 +7,10 @@ import { useSocket } from '../../contexts/SocketContext';
  * settlement + road are placed, dice once both dice are rolled), so they show
  * an info tip instead of an end-turn button.
  */
-const EndTurnButton: React.FC = () => {
+const EndTurnButton: React.FC<{ variant?: 'panel' | 'snackbar' }> = ({ variant = 'panel' }) => {
   const { gameRoom, currentPlayer } = useGameRoom();
   const { endTurn: onEndTurn } = useSocket();
+  const snack = variant === 'snackbar';
 
   // Label for the manual-advance phases (derived at render time).
   const phaseText = (phase: string): string => {
@@ -57,14 +58,22 @@ const EndTurnButton: React.FC = () => {
     ].filter(Boolean);
 
     return (
-      <div className="px-4 py-2 text-sm rounded-md border border-blue-200 bg-blue-50 text-blue-800">
+      <div
+        className={
+          snack
+            ? 'text-[13px] font-semibold'
+            : 'px-4 py-2 text-sm rounded-md border border-blue-200 bg-blue-50 text-blue-800'
+        }
+      >
         {isMyTurn ? (
           needs.length > 0 ? (
             <>
               Place: {needs.join(' + ')}
-              <span className="block text-xs text-blue-600 mt-0.5">
-                Setup ends automatically once both are placed.
-              </span>
+              {!snack && (
+                <span className="block text-xs text-blue-600 mt-0.5">
+                  Setup ends automatically once both are placed.
+                </span>
+              )}
             </>
           ) : (
             'Setup complete — advancing...'
@@ -81,21 +90,31 @@ const EndTurnButton: React.FC = () => {
   if (gameRoom.turnState.phase === 'Dice') {
     const sevenPending = gameRoom.robberMove?.reason === 'seven';
     return (
-      <div className="px-4 py-2 text-sm rounded-md border border-blue-200 bg-blue-50 text-blue-800">
+      <div
+        className={
+          snack
+            ? 'text-[13px] font-semibold'
+            : 'px-4 py-2 text-sm rounded-md border border-blue-200 bg-blue-50 text-blue-800'
+        }
+      >
         {isMyTurn ? (
           sevenPending ? (
             <>
               Move the robber to continue
-              <span className="block text-xs text-blue-600 mt-0.5">
-                You rolled a 7 — drag the black robber to a hex on the board.
-              </span>
+              {!snack && (
+                <span className="block text-xs text-blue-600 mt-0.5">
+                  You rolled a 7 — drag the black robber to a hex on the board.
+                </span>
+              )}
             </>
           ) : (
             <>
               Roll both dice to continue
-              <span className="block text-xs text-blue-600 mt-0.5">
-                The phase ends automatically once both dice are rolled.
-              </span>
+              {!snack && (
+                <span className="block text-xs text-blue-600 mt-0.5">
+                  The phase ends automatically once both dice are rolled.
+                </span>
+              )}
             </>
           )
         ) : (
@@ -109,7 +128,9 @@ const EndTurnButton: React.FC = () => {
   }
 
   const buttonClass =
-    'w-full px-4 py-2 text-sm text-center rounded-md border border-gray-300 bg-blue-600 text-white cursor-pointer';
+    variant === 'snackbar'
+      ? 'px-3 py-1.5 text-[13px] font-semibold rounded-md bg-white/25 cursor-pointer hover:bg-white/40'
+      : 'w-full px-4 py-2 text-sm text-center rounded-md border border-gray-300 bg-blue-600 text-white cursor-pointer';
 
   return (
     <div className="flex flex-col gap-1">
@@ -118,12 +139,24 @@ const EndTurnButton: React.FC = () => {
           {phaseText(gameRoom.turnState.phase)}
         </button>
       ) : (
-        <div className="px-4 py-2 text-sm text-center rounded-md border border-gray-300 bg-gray-200 text-gray-500">
+        <div
+          className={
+            snack
+              ? 'text-[13px] font-semibold'
+              : 'px-4 py-2 text-sm text-center rounded-md border border-gray-300 bg-gray-200 text-gray-500'
+          }
+        >
           Waiting on {gameRoom.turnState.player}
         </div>
       )}
       {gameRoom.turnState.phase === 'Action' && isMyTurn && soldiersWithActionsLeft > 0 && (
-        <div className="px-2 py-1 text-xs text-center rounded border border-amber-200 bg-amber-50 text-amber-800">
+        <div
+          className={
+            snack
+              ? 'text-[11px] font-semibold text-amber-200'
+              : 'px-2 py-1 text-xs text-center rounded border border-amber-200 bg-amber-50 text-amber-800'
+          }
+        >
           ⚠ {soldiersWithActionsLeft} soldier{soldiersWithActionsLeft > 1 ? 's' : ''} still have action(s) left
         </div>
       )}
