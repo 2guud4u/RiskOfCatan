@@ -18,11 +18,11 @@ import { priceLabel } from '../../utils/price';
  */
 const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex }) => {
   const { gameRoom, currentPlayer, setSelectedObject } = useGameRoom();
-  const { buildSettlement, upgradeSettlementToCity, buildSoldier, moveSoldier, healSoldier, startAttack } = useSocket();
+  const { buildSettlement, upgradeSettlementToCity, recruitSoldier, moveSoldier, healSoldier, startAttack } = useSocket();
   const {
     canBuildSettlementAt,
     canUpgradeToCityAt,
-    canBuildSoldierAt,
+    canRecruitSoldierAt,
     canMoveSoldierTo,
     canHealSoldierAt,
   } = useBuildRules(board);
@@ -116,9 +116,9 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
     upgradeSettlementToCity(currentPlayer.id, vertex.id, gameRoom.id);
   };
 
-  const handleBuildSoldier = () => {
+  const handleRecruitSoldier = () => {
     if (!gameRoom || !currentPlayer) return;
-    buildSoldier(currentPlayer.id, vertex.id, gameRoom.id);
+    recruitSoldier(currentPlayer.id, vertex.id, gameRoom.id);
   };
 
   const clearGroup = () => {
@@ -168,7 +168,7 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
           <button
             type="button"
             onClick={clearGroup}
-            className="text-[11px] text-gray-500 hover:text-gray-700"
+            className="text-[11px] text-gray-100 hover:text-gray-700"
           >
             ✕ Clear
           </button>
@@ -189,10 +189,10 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
         </div>
 
         {!isMyTurnActionPhase && (
-          <div className="text-gray-500 text-[11px]">Actions available on your Action phase.</div>
+          <div className="text-gray-100 text-[11px]">Actions available on your Action phase.</div>
         )}
         {isMyTurnActionPhase && battle && (
-          <div className="text-gray-500 text-[11px]">A battle is already in progress.</div>
+          <div className="text-gray-100 text-[11px]">A battle is already in progress.</div>
         )}
 
         {/* Heal actions for injured members. */}
@@ -296,7 +296,7 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
           className={buildButtonClass}
           title={`Build settlement (${priceLabel(SettlementPrice)})`}
         >
-          Build Settlement <span className="text-gray-500 text-xs">({priceLabel(SettlementPrice)})</span>
+          Build Settlement <span className="text-gray-100 text-xs">({priceLabel(SettlementPrice)})</span>
         </button>
       )}
 
@@ -306,17 +306,17 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
           className={buildButtonClass}
           title={`Upgrade to city (${priceLabel(CityPrice)})`}
         >
-          Upgrade to City <span className="text-gray-500 text-xs">({priceLabel(CityPrice)})</span>
+          Upgrade to City <span className="text-gray-100 text-xs">({priceLabel(CityPrice)})</span>
         </button>
       )}
 
-      {settlement && settlement.ownerId === currentPlayer?.name && canBuildSoldierAt(vertex.id) && (
+      {settlement && settlement.ownerId === currentPlayer?.name && canRecruitSoldierAt(vertex.id) && (
         <button
-          onClick={handleBuildSoldier}
+          onClick={handleRecruitSoldier}
           className={buildButtonClass}
-          title={`Build a soldier here (${priceLabel(SoldierPrice)})`}
+          title={`Recruit a soldier here (${priceLabel(SoldierPrice)})`}
         >
-          ⚔ Build Soldier <span className="text-gray-500 text-xs">({priceLabel(SoldierPrice)})</span>
+          ⚔ Recruit Soldier <span className="text-gray-100 text-xs">({priceLabel(SoldierPrice)})</span>
         </button>
       )}
 
@@ -325,7 +325,7 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
 
       {/* Hint before any selection, when troops are present here. */}
       {selectedGroup.length === 0 && soldiersHere.length > 0 && (
-        <p className="text-[13px] text-gray-500 m-0">
+        <p className="text-[13px] text-gray-100 m-0">
           {groupActionsAllowed
             ? 'Click your soldiers in the map above to select a group, then move or attack with it.'
             : 'Soldiers act during your Action phase.'}

@@ -56,7 +56,7 @@ export type UndoEntry =
       soldierId: string;
     }
   | {
-      kind: 'buildSoldier';
+      kind: 'recruitSoldier';
       soldierId: string;
     }
   | {

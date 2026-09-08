@@ -3,7 +3,7 @@ import {
   canBuildSettlementAt as checkSettlement,
   canBuildRoadOn as checkRoad,
   canUpgradeSettlementToCity as checkCity,
-  canBuildSoldierAt as checkSoldier,
+  canRecruitSoldierAt as checkSoldier,
   canMoveSoldierTo as checkMoveSoldier,
   canHealSoldierAt as checkHealSoldier,
 } from 'common';
@@ -54,7 +54,7 @@ export function useBuildRules(board: Board) {
   const canBuildSettlementAt = (vertexId: string): boolean => settlementCheck(vertexId).allowed;
   const canBuildRoadOn = (edgeId: string): boolean => roadCheck(edgeId).allowed;
   const canUpgradeToCityAt = (vertexId: string): boolean => cityCheck(vertexId).allowed;
-  const canBuildSoldierAt = (vertexId: string): boolean => soldierCheck(vertexId).allowed;
+  const canRecruitSoldierAt = (vertexId: string): boolean => soldierCheck(vertexId).allowed;
   const canMoveSoldierTo = (soldierId: string, targetVertexId: string): boolean =>
     moveSoldierCheck(soldierId, targetVertexId).allowed;
 
@@ -64,7 +64,7 @@ export function useBuildRules(board: Board) {
     canBuildSettlementAt,
     canBuildRoadOn,
     canUpgradeToCityAt,
-    canBuildSoldierAt,
+    canRecruitSoldierAt,
     canMoveSoldierTo,
     canHealSoldierAt,
   };

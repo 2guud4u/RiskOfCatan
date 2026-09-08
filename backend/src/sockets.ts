@@ -11,7 +11,7 @@ import {
   canBuildSettlementAt,
   canBuildRoadOn,
   canUpgradeSettlementToCity,
-  canBuildSoldierAt,
+  canRecruitSoldierAt,
   canPlaceRobberOn,
   placeRobber,
   playersAdjacentToHex,
@@ -518,7 +518,7 @@ export function setupSocketHandlers(io: Server): void {
           removeSoldierTracking(turnState, entry.soldierId);
           break;
         }
-        case 'buildSoldier': {
+        case 'recruitSoldier': {
           actingPlayer.resources = addPrice(actingPlayer.resources, SoldierPrice);
           delete board.soldiers[entry.soldierId];
           removeSoldierTracking(turnState, entry.soldierId);
@@ -913,7 +913,7 @@ export function setupSocketHandlers(io: Server): void {
       io.to(roomId).emit('gameUpdate', { ...room });
     });
 
-    socket.on('buildSoldier', (data: { roomId: string; playerId: string; vertexId: string }) => {
+    socket.on('recruitSoldier', (data: { roomId: string; playerId: string; vertexId: string }) => {
       const { roomId, playerId, vertexId } = data;
       const room = gameRooms.get(roomId);
       if (!room) {
@@ -933,9 +933,9 @@ export function setupSocketHandlers(io: Server): void {
       }
 
       // Authoritative rules live in common (shared with the UI).
-      const check = canBuildSoldierAt(board, turnState, currentPlayer.name, vertexId, currentPlayer.resources);
+      const check = canRecruitSoldierAt(board, turnState, currentPlayer.name, vertexId, currentPlayer.resources);
       if (!check.allowed) {
-        socket.emit('error', { message: check.reason ?? 'Cannot build soldier here' });
+        socket.emit('error', { message: check.reason ?? 'Cannot recruit soldier here' });
         return;
       }
 
@@ -954,13 +954,13 @@ export function setupSocketHandlers(io: Server): void {
       // Track this soldier so it cannot move/attack this turn (Rules.md line 24).
       turnState.soldiersCreatedThisTurn.push(newSoldierId);
 
-      // A freshly built soldier has used its action for this phase.
+      // A freshly recruited soldier has used its action for this phase.
       turnState.soldiersActedThisTurn.push(newSoldierId);
 
-      // Record the build so it can be undone (refunds the cost, deletes the
-      // soldier, and clears its tracking so it is no longer considered built).
+      // Record the recruitment so it can be undone (refunds the cost, deletes
+      // the soldier, and clears its tracking so it is no longer considered recruited).
       turnState.undoLog.push({
-        kind: 'buildSoldier',
+        kind: 'recruitSoldier',
         soldierId: newSoldierId,
       });
 

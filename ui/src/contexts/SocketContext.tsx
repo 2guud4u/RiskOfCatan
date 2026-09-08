@@ -27,7 +27,7 @@ interface SocketContextType {
   buildSettlement: (playerId: string, vertexId: string, roomId: string) => void;
   buildRoad: (playerId: string, edgeId: string, roomId: string) => void;
   upgradeSettlementToCity: (playerId: string, vertexId: string, roomId: string) => void;
-  buildSoldier: (playerId: string, vertexId: string, roomId: string) => void;
+  recruitSoldier: (playerId: string, vertexId: string, roomId: string) => void;
   moveSoldier: (playerId: string, soldierId: string, targetVertexId: string, roomId: string) => void;
   moveRobber: (playerId: string, hexId: string, roomId: string) => void;
   chooseSteal: (playerId: string, victimName: string, cardIndex: number, roomId: string) => void;
@@ -63,7 +63,7 @@ const SocketContext = createContext<SocketContextType>({
   buildSettlement: () => { },
   buildRoad: () => { },
   upgradeSettlementToCity: () => { },
-  buildSoldier: () => { },
+  recruitSoldier: () => { },
   moveSoldier: () => { },
   moveRobber: () => { },
   chooseSteal: () => { },
@@ -106,8 +106,8 @@ const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =
   const upgradeSettlementToCity = (playerId: string, vertexId: string, roomId: string) =>
     emitAction(socket, 'upgradeSettlementToCity', { roomId, playerId, vertexId }, { requirePlayerId: true });
 
-  const buildSoldier = (playerId: string, vertexId: string, roomId: string) =>
-    emitAction(socket, 'buildSoldier', { roomId, playerId, vertexId }, { requirePlayerId: true });
+  const recruitSoldier = (playerId: string, vertexId: string, roomId: string) =>
+    emitAction(socket, 'recruitSoldier', { roomId, playerId, vertexId }, { requirePlayerId: true });
 
   const moveSoldier = (playerId: string, soldierId: string, targetVertexId: string, roomId: string) =>
     emitAction(socket, 'moveSoldier', { roomId, playerId, soldierId, targetVertexId }, { requirePlayerId: true });
@@ -216,7 +216,7 @@ const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =
         buildSettlement,
         buildRoad,
         upgradeSettlementToCity,
-        buildSoldier,
+        recruitSoldier,
         moveSoldier,
         moveRobber,
         chooseSteal,

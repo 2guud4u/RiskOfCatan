@@ -140,11 +140,11 @@ export function canUpgradeSettlementToCity(
 }
 
 /**
- * Authoritative soldier build check, shared by the UI and the backend:
- * only during Build phase, on your turn, on one of your own settlements,
+ * Authoritative soldier recruitment check, shared by the UI and the backend:
+ * only during the Action phase, on your turn, on one of your own settlements,
  * and you must afford the soldier cost.
  */
-export function canBuildSoldierAt(
+export function canRecruitSoldierAt(
   board: Board,
   turn: TurnState,
   playerName: string,
@@ -152,9 +152,9 @@ export function canBuildSoldierAt(
   playerResources?: ResourceCount
 ): BuildCheck {
   if (turn.player !== playerName) return { allowed: false, reason: 'Not your turn' };
-  // Soldiers are built during the Action phase (Rules.md "Soldier" section).
+  // Soldiers are recruited during the Action phase (Rules.md "Soldier" section).
   if (turn.phase !== 'Action')
-    return { allowed: false, reason: 'Soldiers can only be built in the Action phase' };
+    return { allowed: false, reason: 'Soldiers can only be recruited in the Action phase' };
 
   const vertex = board.vertices[vertexId];
   if (!vertex || !vertex.settlementId)
@@ -163,7 +163,7 @@ export function canBuildSoldierAt(
   const settlement = board.settlements[vertex.settlementId];
   if (!settlement) return { allowed: false, reason: 'Settlement not found' };
   if (settlement.ownerId !== playerName)
-    return { allowed: false, reason: 'You can only build soldiers on your own settlements' };
+    return { allowed: false, reason: 'You can only recruit soldiers on your own settlements' };
 
   if (playerResources && !canAfford(playerResources, SoldierPrice))
     return { allowed: false, reason: 'Not enough resources for a soldier (1 Wheat, 1 Sheep)' };
