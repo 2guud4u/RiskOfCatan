@@ -12,4 +12,6 @@ export interface Player {
   victoryPoints: number;
   /** Free roads remaining (from a played Road Building card). */
   freeRoadsLeft: number;
+  /** Dev cards bought this turn (cannot be played until next turn). */
+  devCardsBoughtThisTurn: number;
 }

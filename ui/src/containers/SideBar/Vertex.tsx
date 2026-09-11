@@ -7,6 +7,7 @@ import { useBuildRules } from './useBuildRules';
 import { buildButtonClass, hexChipClass } from './styles';
 import { playerColorMap } from '../../utils/soldierPlacement';
 import { priceLabel } from '../../utils/price';
+import { triggerBuildAnimation } from '../../components/ResourceSpendLayer';
 
 /**
  * Sidebar panel for a selected vertex: mini view of the vertex and its
@@ -109,16 +110,19 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
   const handleBuildSettlement = () => {
     if (!gameRoom || !currentPlayer) return;
     buildSettlement(currentPlayer.id, vertex.id, gameRoom.id);
+    triggerBuildAnimation({ type: 'settlement', locationId: vertex.id });
   };
 
   const handleUpgradeToCity = () => {
     if (!gameRoom || !currentPlayer) return;
     upgradeSettlementToCity(currentPlayer.id, vertex.id, gameRoom.id);
+    triggerBuildAnimation({ type: 'city', locationId: vertex.id });
   };
 
   const handleRecruitSoldier = () => {
     if (!gameRoom || !currentPlayer) return;
     recruitSoldier(currentPlayer.id, vertex.id, gameRoom.id);
+    triggerBuildAnimation({ type: 'soldier', locationId: vertex.id });
   };
 
   const clearGroup = () => {
@@ -296,7 +300,7 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
           className={buildButtonClass}
           title={`Build settlement (${priceLabel(SettlementPrice)})`}
         >
-          Build Settlement <span className="text-gray-100 text-xs">({priceLabel(SettlementPrice)})</span>
+          Build Settlement <span className="text-white text-xs">({priceLabel(SettlementPrice)})</span>
         </button>
       )}
 
@@ -306,7 +310,7 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
           className={buildButtonClass}
           title={`Upgrade to city (${priceLabel(CityPrice)})`}
         >
-          Upgrade to City <span className="text-gray-100 text-xs">({priceLabel(CityPrice)})</span>
+          Upgrade to City <span className="text-white text-xs">({priceLabel(CityPrice)})</span>
         </button>
       )}
 
@@ -316,7 +320,7 @@ const Vertex: React.FC<{ board: Board; vertex: VertexNode }> = ({ board, vertex 
           className={buildButtonClass}
           title={`Recruit a soldier here (${priceLabel(SoldierPrice)})`}
         >
-          ⚔ Recruit Soldier <span className="text-gray-100 text-xs">({priceLabel(SoldierPrice)})</span>
+          ⚔ Recruit Soldier <span className="text-white text-xs">({priceLabel(SoldierPrice)})</span>
         </button>
       )}
 

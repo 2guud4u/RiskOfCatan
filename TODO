@@ -19,10 +19,15 @@ allow dragging of soldiers in the mini map
 
 
 Feature:
-undo button for buying stuff 
-fighting injured soldier logic
+]fighting injured soldier logic
+revamp moving resource animation to go to the card tab if its not on
+when dice phase, jump to roll dice tab
+robber pile rules- and fight robber
 
+random late game join, allow random placement of settlement
 
 Bug: 
 built roads when didnt have enough resources(brick speciificaly)
+in setup, my second road and settlement does not have to follow settlement then road order
+if you leave game, you should be removed from player list
 

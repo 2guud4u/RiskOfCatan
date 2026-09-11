@@ -1,97 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useGameRoom } from '../contexts/GameContext';
 import { cubeToPixel, ResourceKey, RESOURCES } from 'common';
-import { RESOURCE_ICONS } from '../utils/resourceIcons';
 import { BOARD_CENTER, GAIN_DURATION, GAIN_STAGGER, PROJ_SIZE } from '../constants';
+import { FlyIcon, nextIconId, toScreen, FlyIconView, resolveResourceAnchor } from './FlyIcon';
 
-/** A single resource icon flying from a source point to the resource panel. */
-interface FlyIcon {
-  id: number;
-  resource: ResourceKey;
-  sourceX: number;
-  sourceY: number;
-  targetX: number;
-  targetY: number;
-  delay: number;
-}
-
-let nextId = 0;
-
-/**
- * Convert an SVG-space point (the board's pre-projection coordinate space) to
- * if the SVG has no CTM (e.g. not yet laid out).
- */
-function toScreen(
-  svg: SVGSVGElement,
-  x: number,
-  y: number
-): { x: number; y: number } | null {
-  const ctm = svg.getScreenCTM();
-  if (!ctm) return null;
-  const pt = svg.createSVGPoint();
-  pt.x = x;
-  pt.y = y;
-  const p = pt.matrixTransform(ctm);
-  return { x: p.x, y: p.y };
-}
-
-/**
- * A resource icon that flies from its source point to the target point, then
- * reports itself done so the parent can remove it.
- */
-const FlyIconView: React.FC<{
-  icon: FlyIcon;
-  onDone: (id: number) => void;
-}> = ({ icon, onDone }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const doneRef = useRef(onDone);
-  doneRef.current = onDone;
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const anim = el.animate(
-      [
-        {
-          transform: `translate(${icon.sourceX}px, ${icon.sourceY}px) scale(1)`,
-          opacity: 1,
-        },
-        {
-          transform: `translate(${icon.targetX}px, ${icon.targetY}px) scale(0.9)`,
-          opacity: 1,
-          offset: 0.85,
-        },
-        {
-          transform: `translate(${icon.targetX}px, ${icon.targetY}px) scale(0.4)`,
-          opacity: 0,
-        },
-      ],
-      {
-        duration: GAIN_DURATION,
-        delay: icon.delay,
-        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-        fill: 'forwards',
-      }
-    );
-    anim.onfinish = () => doneRef.current(icon.id);
-    return () => anim.cancel();
-  }, [icon]);
-
-  return (
-    <div
-      ref={ref}
-      className="fixed left-0 top-0 z-[60] pointer-events-none will-change-transform"
-      style={{ transform: `translate(${icon.sourceX}px, ${icon.sourceY}px)` }}
-    >
-      <span className="text-2xl drop-shadow">{RESOURCE_ICONS[icon.resource]}</span>
-    </div>
-  );
-};
 
 /**
  * Overlay that animates resource gains: when the current player gains
  * resources (from a dice roll, a robber steal, or any other source), the
- * gained cards fly from the source on the board to the resource panel.
+ * gained cards fly from the source on the board to the resource anchor
+ * (the "Your Resources" section when the Cards tab is open, otherwise the
+ * Cards tab header).
  */
 const ResourceGainLayer: React.FC = () => {
   const { gameRoom, currentPlayer } = useGameRoom();
@@ -145,13 +64,6 @@ const ResourceGainLayer: React.FC = () => {
 
 
     if (totalGained > 0 && gameRoom.board) {
-      // Target: the resource panel center (screen coords).
-      const panel = document.querySelector('[data-resource-panel]');
-      let target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-      if (panel) {
-        const r = panel.getBoundingClientRect();
-        target = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-      }
       const svg = document.querySelector(
         '[data-board-svg]'
       ) as SVGSVGElement | null;
@@ -186,32 +98,38 @@ const ResourceGainLayer: React.FC = () => {
         return cubeToPixel(BOARD_CENTER, PROJ_SIZE);
       };
 
-      const newIcons: FlyIcon[] = [];
-      let staggerIdx = 0;
-      for (const k of RESOURCES) {
-        const count = gains[k] ?? 0;
-        if (count <= 0) continue;
+      const spawnIcons = (target: { x: number; y: number }) => {
+        const newIcons: FlyIcon[] = [];
+        let staggerIdx = 0;
+        for (const k of RESOURCES) {
+          const count = gains[k] ?? 0;
+          if (count <= 0) continue;
 
-        const sp = sourceFor(k);
-        const screen = svg ? toScreen(svg, sp.x, sp.y) : null;
-        const sx = screen ? screen.x : window.innerWidth / 2;
-        const sy = screen ? screen.y : window.innerHeight / 2;
+          const sp = sourceFor(k);
+          const screen = svg ? toScreen(svg, sp.x, sp.y) : null;
+          const sx = screen ? screen.x : window.innerWidth / 2;
+          const sy = screen ? screen.y : window.innerHeight / 2;
 
-        for (let i = 0; i < count; i++) {
-          newIcons.push({
-            id: nextId++,
-            resource: k,
-            sourceX: sx,
-            sourceY: sy,
-            targetX: target.x,
-            targetY: target.y,
-            delay: staggerIdx++ * GAIN_STAGGER,
-          });
+          for (let i = 0; i < count; i++) {
+            newIcons.push({
+              id: nextIconId(),
+              resource: k,
+              sourceX: sx,
+              sourceY: sy,
+              targetX: target.x,
+              targetY: target.y,
+              delay: staggerIdx++ * GAIN_STAGGER,
+            });
+          }
         }
-      }
-      if (newIcons.length > 0) {
-        setIcons((prevIcons) => [...prevIcons, ...newIcons]);
-      }
+        if (newIcons.length > 0) {
+          setIcons((prevIcons) => [...prevIcons, ...newIcons]);
+        }
+      };
+
+      // The icons fly to the resource anchor (the "Your Resources" section
+      // when the Cards tab is open, otherwise the Cards tab header).
+      resolveResourceAnchor(spawnIcons);
     }
 
     prevResources.current = { ...res };
@@ -224,7 +142,7 @@ const ResourceGainLayer: React.FC = () => {
   return (
     <>
       {icons.map((icon) => (
-        <FlyIconView key={icon.id} icon={icon} onDone={removeIcon} />
+        <FlyIconView key={icon.id} icon={icon} duration={GAIN_DURATION} onDone={removeIcon} />
       ))}
     </>
   );

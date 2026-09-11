@@ -22,6 +22,9 @@ export function advanceTurn(room: GameRoom): void {
 
       if (turnState.offset === totalSetupTurns - 1) {
         // Setup complete, start dice phase with first player.
+        // A new round begins: clear the per-round soldier restrictions (Rule 24/25)
+        // so soldiers garrisoned during setup can move in the first Action phase.
+        // The per-action-phase action count resets when the Action phase begins.
         room.turnState = {
           ...turnState,
           player: turnState.playerOrder[0],
@@ -29,6 +32,8 @@ export function advanceTurn(room: GameRoom): void {
           offset: 0,
           placedSettlement: null,
           placedRoad: null,
+          soldiersCreatedThisTurn: [],
+          soldiersHealedThisTurn: [],
           undoLog: [],
         };
         room.roll = { die1: null, die2: null };
@@ -67,11 +72,13 @@ export function advanceTurn(room: GameRoom): void {
     case 'Build':
       if (turnState.offset === playerCount - 1) {
         // All players have built, move to Action phase with dice player.
+        // A new Action phase begins: reset the per-soldier action count.
         room.turnState = {
           ...turnState,
           player: turnState.playerOrder[turnState.dicePlayerIndex],
           phase: 'Action',
           offset: 0,
+          soldiersActedThisTurn: [],
           undoLog: [],
         };
       } else {
@@ -89,19 +96,20 @@ export function advanceTurn(room: GameRoom): void {
     case 'Action':
       if (turnState.offset === playerCount - 1) {
         // All players have acted, move to next player's Dice phase.
-        // A new round begins: clear the per-turn soldier tracking arrays.
+        // A new round begins: clear the per-round soldier restrictions (Rule 24/25).
         turnState.dicePlayerIndex = (turnState.dicePlayerIndex + 1) % playerCount;
         room.turnState = {
           ...turnState,
           player: turnState.playerOrder[turnState.dicePlayerIndex],
           phase: 'Dice',
           offset: 0,
-          soldiersActedThisTurn: [],
           soldiersCreatedThisTurn: [],
           soldiersHealedThisTurn: [],
           undoLog: [],
         };
         room.roll = { die1: null, die2: null };
+        // A new round: cards bought last turn are now playable.
+        for (const p of room.players) p.devCardsBoughtThisTurn = 0;
       } else {
         // Next player's turn for action; each soldier keeps its own action limit.
         const nextPlayerIndex = (playerIndex + 1) % playerCount;

@@ -120,6 +120,7 @@ export function setupSocketHandlers(io: Server): void {
         developmentCards: [],
         victoryPoints: 0,
         freeRoadsLeft: 0,
+        devCardsBoughtThisTurn: 0,
       };
 
       room.players.push(player);
@@ -239,6 +240,8 @@ export function setupSocketHandlers(io: Server): void {
         player.victoryPoints++;
       } else {
         player.developmentCards.push(card);
+        // A card bought this turn can't be played until next turn.
+        player.devCardsBoughtThisTurn++;
       }
 
       applyBonuses(room);
@@ -269,6 +272,12 @@ export function setupSocketHandlers(io: Server): void {
       const card = player.developmentCards[cardIndex];
       if (!card) {
         socket.emit('error', { message: 'Invalid card index' });
+        return;
+      }
+      // A card bought this turn can't be played until next turn: the last
+      // `devCardsBoughtThisTurn` cards in the hand are the ones just bought.
+      if (cardIndex >= player.developmentCards.length - player.devCardsBoughtThisTurn) {
+        socket.emit('error', { message: 'A card bought this turn can only be played next turn' });
         return;
       }
       // A pending robber move (from a 7 or an earlier knight) must be

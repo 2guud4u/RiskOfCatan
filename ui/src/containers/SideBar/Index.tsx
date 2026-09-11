@@ -13,6 +13,7 @@ import EndTurnButton from './EndTurnButton';
 import { cardClass } from './styles';
 type Tab = 'board' | 'dice' | 'players' | 'cards' | 'trade' | 'battle';
 
+
 /**
  * Sidebar with tabs: Board (selected vertex/edge viewer, including soldier
  * selection & actions), Dice (dice roll and the end-turn control), Players
@@ -36,6 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ layout, onMeasure }) => {
   useEffect(() => {
     if (selectedObject) setTab('board');
   }, [selectedObject]);
+
 
   if (!gameRoom || !currentPlayer || !board) {
     return null;
@@ -113,7 +115,7 @@ const Sidebar: React.FC<SidebarProps> = ({ layout, onMeasure }) => {
           <button type="button" className={tabClass(tab === 'dice')} onClick={() => switchTab('dice')}>
             Dice
           </button>
-          <button type="button" className={tabClass(tab === 'cards')} onClick={() => switchTab('cards')}>
+          <button type="button" data-cards-tab="true" className={tabClass(tab === 'cards')} onClick={() => switchTab('cards')}>
             Cards
           </button>
           <button type="button" className={tabClass(tab === 'trade')} onClick={() => switchTab('trade')}>

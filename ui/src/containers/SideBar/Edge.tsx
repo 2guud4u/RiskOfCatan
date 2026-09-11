@@ -7,6 +7,7 @@ import { useBuildRules } from './useBuildRules';
 import { priceLabel } from '../../utils/price';
 import { buildButtonClass, hexChipClass } from './styles';
 import { playerColorMap } from '../../utils/soldierPlacement';
+import { triggerBuildAnimation } from '../../components/ResourceSpendLayer';
 
 /**
  * Sidebar panel for a selected edge: mini view of the edge and its
@@ -32,6 +33,7 @@ const Edge: React.FC<{ board: Board; edge: EdgeNode }> = ({ board, edge }) => {
   const handleBuildRoad = () => {
     if (!gameRoom || !currentPlayer) return;
     buildRoad(currentPlayer.id, edge.id, gameRoom.id);
+    triggerBuildAnimation({ type: 'road', locationId: edge.id });
   };
 
   return (
@@ -61,7 +63,7 @@ const Edge: React.FC<{ board: Board; edge: EdgeNode }> = ({ board, edge }) => {
           title={hasFreeRoad ? 'Build road (FREE — Road Building card)' : `Build road (${priceLabel(RoadPrice)})`}
         >
           Build Road{' '}
-          <span className="text-gray-500 text-xs">
+          <span className="text-white text-xs">
             {hasFreeRoad ? '(FREE 🛤️)' : `(${priceLabel(RoadPrice)})`}
           </span>
         </button>

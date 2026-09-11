@@ -8,6 +8,7 @@ import RobberPrompt from './RobberPrompt';
 import StealPrompt from './StealPrompt';
 import DevCardPrompt from './DevCardPrompt';
 import ResourceGainLayer from '../components/ResourceGainLayer';
+import ResourceSpendLayer from '../components/ResourceSpendLayer';
 import BattleModal from './BattleModal';
 import DraggablePanel from '../components/DraggablePanel';
 import { resetAllPanels } from '../components/DraggablePanel';
@@ -142,6 +143,8 @@ const Game: React.FC = () => {
 
       {/* Resource gain animation: cards fly from the source to the panel. */}
       <ResourceGainLayer />
+      {/* Resource spend animation: cards fly from the panel to the build location. */}
+      <ResourceSpendLayer />
 
       {/* Separate battle window that opens for all players while combat is active. */}
       {/* Turn snackbar: phase + control on the board's bottom edge, colored by phase. */}
