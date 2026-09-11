@@ -43,6 +43,7 @@ import {
   canBankTrade,
   applyBankTrade,
   bestBankTradeRatio,
+  generateDevelopmentCardDeck,
 } from 'common';
 import { gameRooms, createGameRoom, createBoard } from './store';
 import { advanceTurn } from './turn';
@@ -221,9 +222,9 @@ export function setupSocketHandlers(io: Server): void {
         socket.emit('error', { message: 'You can only buy development cards on your turn' });
         return;
       }
+      // The deck is reshuffled (regenerated) when it is exhausted.
       if (room.devCardDeck.length === 0) {
-        socket.emit('error', { message: 'No development cards left in the deck' });
-        return;
+        room.devCardDeck = generateDevelopmentCardDeck();
       }
       if (!canAfford(player.resources, DevelopmentCardPrice)) {
         socket.emit('error', {

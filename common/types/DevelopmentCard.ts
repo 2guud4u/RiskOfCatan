@@ -1,12 +1,12 @@
 /**
  * Development Card types for Catan-style gameplay.
  * 
- * Standard Catan deck distribution (25 cards total):
- * - Knights: 4 - move robber, steal from player with most resource cards
- * - Road Building: 1 - build up to 2 roads at no cost
- * - Year of Plenty: 1 - take any 2 resources from the bank
- * - Monopoly: 1 - name a resource type, all other players give you their cards of that type
- * - Victory Points: 3 - each worth 1 victory point
+ * Deck distribution (25 cards total):
+ * - Knights: 14 - move robber and help build the Largest Army
+ * - Victory Points: 5 - each worth 1 victory point (Chapel, Library, Market, Palace, University)
+ * - Road Building: 2 - build up to 2 roads at no cost
+ * - Year of Plenty: 2 - take any 2 resources from the bank
+ * - Monopoly: 2 - name a resource type, all other players give you their cards of that type
  */
 
 export type DevelopmentCardType =
@@ -18,11 +18,11 @@ export type DevelopmentCardType =
 
 /** Standard distribution of development cards in the deck. */
 export const DEVELOPMENT_CARD_DISTRIBUTION: Record<DevelopmentCardType, number> = {
-  knight: 4,
-  road_building: 1,
-  year_of_plenty: 1,
-  monopoly: 1,
-  victory_point: 3,
+  knight: 14,
+  victory_point: 5,
+  road_building: 2,
+  year_of_plenty: 2,
+  monopoly: 2,
 };
 
 /** Total number of development cards in the deck. */
