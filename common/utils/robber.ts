@@ -28,8 +28,9 @@ export function placeRobber(board: Board, hexId: HexId): void {
 }
 
 /**
- * Names of players (optionally excluding one) with a settlement or a road on
- * a vertex of the given hex.
+ * Names of players (optionally excluding one) with a settlement or a city on
+ * a vertex of the given hex. Roads do not count for steal eligibility
+ * (standard Catan rule).
  */
 export function playersAdjacentToHex(board: Board, hexId: HexId, excludeName?: string): string[] {
   const names = new Set<string>();
@@ -38,10 +39,6 @@ export function playersAdjacentToHex(board: Board, hexId: HexId, excludeName?: s
     if (vertex.settlementId) {
       const settlement = board.settlements[vertex.settlementId];
       if (settlement && settlement.ownerId !== excludeName) names.add(settlement.ownerId);
-    }
-    for (const roadId of vertex.roadIds) {
-      const road = board.roads[roadId];
-      if (road && road.ownerId !== excludeName) names.add(road.ownerId);
     }
   }
   return Array.from(names);

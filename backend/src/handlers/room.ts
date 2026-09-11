@@ -1,0 +1,142 @@
+import { PLAYER_COLORS, Player, applyBonuses } from 'common';
+
+import { createGameRoom, createBoard, gameRooms } from '../store';
+import { HandlerContext } from './context';
+
+/**
+ * Room-lifecycle handlers: joining (with color assignment and the nested
+ * color-update handler), regenerating the map, starting the game, making a
+ * move, resetting, and disconnect.
+ */
+export function registerRoomHandlers(ctx: HandlerContext): void {
+  const { io, socket } = ctx;
+
+  // Handle room joining.
+  socket.on('joinRoom', (data: { roomId: string; playerName: string; color?: string }) => {
+    const { roomId, playerName, color } = data;
+    let room = gameRooms.get(roomId);
+    if (!room) {
+      room = createGameRoom(roomId, playerName);
+    }
+    if (room.players.length >= 4) {
+      socket.emit('error', { message: 'Room is full' });
+      return;
+    }
+    // If the player is already in the room (reconnect / reload), just re-attach.
+    const existing = room.players.find((p) => p.name === playerName);
+    if (existing) {
+      socket.join(roomId);
+      applyBonuses(room);
+      io.to(roomId).emit('roomUpdate', room);
+      return;
+    }
+    // Assign a color: the requested one if free, otherwise the first available.
+    const used = new Set(room.players.map((p) => p.color));
+    let assigned = color;
+    if (!assigned || used.has(assigned)) {
+      assigned = PLAYER_COLORS.find((c) => !used.has(c)) ?? PLAYER_COLORS[0];
+    }
+    const player: Player = {
+      id: socket.id,
+      name: playerName,
+      color: assigned,
+      resources: {
+        Wood: 10,
+        Brick: 10,
+        Sheep: 10,
+        Wheat: 10,
+        Ore: 10,
+      },
+      victoryPoints: 0,
+      developmentCards: [],
+      freeRoadsLeft: 0,
+      devCardsBoughtThisTurn: 0,
+    };
+
+    room.players.push(player);
+    room.turnState.playerOrder = room.players.map((p) => p.name);
+    socket.join(roomId);
+
+    // Send updated room state to all players.
+    applyBonuses(room);
+    io.to(roomId).emit('roomUpdate', room);
+
+    // Allow the player to change their color while still in the lobby.
+    socket.on('updatePlayerColor', (cData: { color: string }) => {
+      const p = room.players.find((pl) => pl.id === socket.id);
+      if (!p) return;
+      const requested = cData.color;
+      const taken = new Set(
+        room.players.filter((pl) => pl.id !== socket.id).map((pl) => pl.color)
+      );
+      p.color = !taken.has(requested) ? requested : PLAYER_COLORS.find((c) => !taken.has(c)) ?? p.color;
+      io.to(roomId).emit('roomUpdate', room);
+    });
+  });
+
+  socket.on('refreshMap', (data: { roomId: string }) => {
+    const { roomId } = data;
+    const room = gameRooms.get(roomId);
+    if (!room) {
+      socket.emit('error', { message: 'Room not found' });
+      return;
+    }
+    // Regenerate the game board.
+    room.board = createBoard();
+    // The new board resets the robber to the desert; drop any pending move.
+    room.robberMove = null;
+    applyBonuses(room);
+    io.to(roomId).emit('roomUpdate', room);
+  });
+
+  socket.on('startGame', (data: { roomId: string }) => {
+    const { roomId } = data;
+    const room = gameRooms.get(roomId);
+    if (!room) {
+      socket.emit('error', { message: 'Room not found' });
+      return;
+    }
+    room.gameStatus = 'playing';
+    applyBonuses(room);
+    io.to(roomId).emit('roomUpdate', room);
+  });
+
+  // Handle game moves.
+  socket.on('makeMove', (data: { roomId: string; position: number }) => {
+    const { roomId } = data;
+    const room = gameRooms.get(roomId);
+    if (!room) {
+      socket.emit('error', { message: 'Room not found' });
+      return;
+    }
+    const player = room.players.find((p) => p.id === socket.id);
+    if (!player) {
+      socket.emit('error', { message: 'Player not found in room' });
+      return;
+    }
+    applyBonuses(room);
+    io.to(roomId).emit('gameUpdate', room);
+  });
+
+  // Reset game.
+  socket.on('resetGame', (data: { roomId: string }) => {
+    const { roomId } = data;
+    const room = gameRooms.get(roomId);
+    if (!room) {
+      socket.emit('error', { message: 'Room not found' });
+      return;
+    }
+    room.turnState.player = 'X';
+    room.gameStatus = room.players.length === 2 ? 'playing' : 'waiting';
+    room.winner = null;
+    room.robberMove = null;
+    applyBonuses(room);
+    io.to(roomId).emit('gameUpdate', room);
+  });
+
+  // Handle disconnect.
+  socket.on('disconnect', () => {
+    // Keep the player in the room so a reload / reconnect can re-attach.
+    // The room and game state are intentionally NOT reset on disconnect.
+  });
+}

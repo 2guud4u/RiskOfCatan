@@ -70,11 +70,11 @@ export const SIDE_COL_MAX = 6;
 /** ms per card flight. */
 export const GAIN_DURATION = 5000;
 /** ms offset between successive cards. */
-export const GAIN_STAGGER = 110;
+export const GAIN_STAGGER = 1100;
 /** ms per card flight for the spend (build) animation. */
-export const SPEND_DURATION = 1500;
+export const SPEND_DURATION = 5000;
 /** ms offset between successive cards for the spend animation. */
-export const SPEND_STAGGER = 80;
+export const SPEND_STAGGER = 1100;
 /** Board center (the desert hex). */
 export const BOARD_CENTER = { q: 0, r: 0, s: 0 };
 

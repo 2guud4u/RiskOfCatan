@@ -5,23 +5,21 @@ import { DefaultRect } from '../../types';
 import Vertex from './Vertex';
 import Edge from './Edge';
 import TradeTab from './TradeTab';
-import BattleTab from './BattleTab';
 import PlayersList from './PlayersList';
 import ResourceCardsPanel from './ResourceCardsPanel';
 import DiceView from './DiceView';
 import EndTurnButton from './EndTurnButton';
 import { cardClass } from './styles';
-type Tab = 'board' | 'dice' | 'players' | 'cards' | 'trade' | 'battle';
+type Tab = 'board' | 'dice' | 'players' | 'cards' | 'trade';
 
 
 /**
  * Sidebar with tabs: Board (selected vertex/edge viewer, including soldier
  * selection & actions), Dice (dice roll and the end-turn control), Players
  * (all players' resources & bonuses), Cards (your resource & development
- * cards), Trade (trade & accept offers on your turn), and Battle (visible
- * while combat is active). The current phase & player live in the turn
- * snackbar. The whole panel can be dragged by its grip handle (see
- * DraggablePanel).
+ * cards), and Trade (trade & accept offers on your turn). The current phase
+ * & player live in the turn snackbar. The whole panel can be dragged by its
+ * grip handle (see DraggablePanel).
  */
 interface SidebarProps {
   layout: DefaultRect | null;
@@ -43,7 +41,6 @@ const Sidebar: React.FC<SidebarProps> = ({ layout, onMeasure }) => {
     return null;
   }
 
-  const battle = gameRoom.battleState ?? null;
 
   const incomingCount = (gameRoom.tradeOffers ?? []).filter(
     (o) => o.to === currentPlayer.name && o.status === 'pending'
@@ -99,8 +96,6 @@ const Sidebar: React.FC<SidebarProps> = ({ layout, onMeasure }) => {
         );
       case 'cards':
         return <ResourceCardsPanel />;
-      case 'battle':
-        return battle ? <BattleTab board={board} battle={battle} /> : <TradeTab />;
       default:
         return <TradeTab />;
     }
@@ -128,11 +123,6 @@ const Sidebar: React.FC<SidebarProps> = ({ layout, onMeasure }) => {
           <button type="button" className={tabClass(tab === 'players')} onClick={() => switchTab('players')}>
             Players
           </button>
-          {battle && (
-            <button type="button" className={tabClass(tab === 'battle')} onClick={() => switchTab('battle')}>
-              ⚔ Battle
-            </button>
-          )}
         </div>
 
         <div className="flex-1 min-h-0 overflow-y-auto">

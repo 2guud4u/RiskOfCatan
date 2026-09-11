@@ -147,9 +147,10 @@ const Game: React.FC = () => {
       <ResourceSpendLayer />
 
       {/* Separate battle window that opens for all players while combat is active. */}
+      <BattleModal />
       {/* Turn snackbar: phase + control on the board's bottom edge, colored by phase. */}
       <div
-        className={`fixed bottom-3 z-50 flex flex-col gap-1.5 px-4 py-2.5 rounded-xl shadow-lg text-white min-w-[240px] ${phaseColor(gameRoom.turnState.phase)}`}
+        className={`fixed bottom-3 z-40 flex flex-col gap-1.5 px-4 py-2.5 rounded-xl shadow-lg text-white min-w-[240px] ${phaseColor(gameRoom.turnState.phase)}`}
         style={{ right: SIDEBAR_W + 12 }}
       >
         <div className="flex items-center gap-2.5">
